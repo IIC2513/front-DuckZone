@@ -5,6 +5,8 @@ function Profile() {
         <div>
             <h1>Mi Perfil</h1>
             <p>Aquí desarrollar vista del perfil</p>
+            <br />
+            <a href='/'>Volver al Inicio</a>
         </div>
     );
 }
