@@ -103,6 +103,8 @@ function Rules() {
                 El esquema de tipos, que muestra que tipos son mas efectivos y la interacción del jugador con la bonificación de luz y la de sombra, es el siguiente:
             </p>
             <img src={esquemaTipos} alt="Esquema de Tipos" />
+            <br />
+            <a href='/'>Volver al Inicio</a>
         </>
     );
 }

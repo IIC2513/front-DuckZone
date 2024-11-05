@@ -31,6 +31,10 @@ function App() {
       <a href='/rules'>Ir a Reglas</a>
       <br />
       <a href='/profile'>Ir a mi Perfil</a>
+      <br />
+      <a href='/newgame'>Crear Partida</a>
+      <br />
+      <a href='/newreport'>Reportar a un Usuario</a>
     </>
   )
 }
