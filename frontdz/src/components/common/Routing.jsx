@@ -4,10 +4,12 @@ import Profile from '../profile/Profile';
 import NewGame from '../game/NewGame';
 import NewReport from '../profile/NewReport';
 import App from './App';
+import Navbar from './navbar';
 function Routing() {
     return(
         <>
         <BrowserRouter>
+            <Navbar />
             <Routes>
                 <Route path="/rules" element={<Rules />} />
                 <Route path="/profile" element={<Profile />} />
