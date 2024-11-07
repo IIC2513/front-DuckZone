@@ -127,3 +127,23 @@ body {
 .read-the-docs {
   color: #888;
 }
+
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1rem;
+}
+
+.card-item {
+  background-color: #f9f9f9;
+  padding: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.element-icon {
+  width: 55px;
+  height: 55px;
+}
