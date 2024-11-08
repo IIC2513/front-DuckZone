@@ -24,7 +24,7 @@ function App() {
   return (
     <>
       <h1>¡Bienvenido a DuckZone!</h1>
-      <button className='jugarboton' href="/newgame">JUGUEMOS</button>
+      <a href='/newgame'><button className='jugarboton' href='/newgame'>JUGUEMOS</button></a>
       <br></br>
       <img src={pato1} className='patito1'></img>
       <img src={pato2} className='patito2'></img>
