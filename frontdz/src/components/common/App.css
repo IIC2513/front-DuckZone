@@ -71,7 +71,40 @@ nav a:hover {
 }
 
 body {
-  padding-top: 6rem; /* Añade un padding para evitar que el contenido quede debajo del navbar */
+  padding-top: 2rem; /* Añade un padding para evitar que el contenido quede debajo del navbar */
+}
+
+.slick-prev, .slick-next {
+  z-index: 1;
+  width: auto; 
+  height: auto; 
+  background: none; 
+  border-radius: 0; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(217, 217, 217, 1); 
+  font-size: 24px; 
+  transition: all 0.3s ease;
+  box-shadow: none; 
+}
+
+.slick-prev:hover, .slick-next:hover {
+  background: none; 
+  box-shadow: none; 
+}
+
+.slick-prev {
+  left: 300px;
+}
+
+.slick-next {
+  right: 300px;
+}
+
+.slick-prev:before, .slick-next:before {
+  color: rgb(141, 141, 141); 
+  font-size: 24px; 
 }
 
 .logo {
