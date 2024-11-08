@@ -31,6 +31,7 @@ function Cards() {
     };
 
     return (
+        <>
         <div>
             <h1>Cartas</h1>
             <p>Aquí puedes ver todas las cartas del juego</p>
@@ -44,7 +45,7 @@ function Cards() {
             </div>
             <br />
             <a href='/'>Volver al Inicio</a>
-        </div>
+        </div></>
     );
 }
 
