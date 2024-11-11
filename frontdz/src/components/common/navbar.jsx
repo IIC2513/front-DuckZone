@@ -1,6 +1,7 @@
 import React from 'react';
 import logo from '../../assets/imgs/image.png';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import LogoutButton from '../profile/Logout';
 
 function Navbar() {
     return (
@@ -13,6 +14,9 @@ function Navbar() {
                     <span>Mi perfil</span>
                     <AccountCircleIcon className='profile-icon'/>
                 </a>
+                <LogoutButton href="/logout" className="logout-button">
+                    Cerrar sesión
+                </LogoutButton>
             </div>
         </nav>
         
