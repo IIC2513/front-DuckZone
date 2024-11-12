@@ -31,7 +31,7 @@ function Signup() {
       const motive = error.response && error.response.data && error.response.data.errors && error.response.data.errors[0] ? error.response.data.errors[0].message : (error.response.data ? error.response.data : 'Unknown error');
       if (motive === "username must be unique") { setMsg('Error al registrarse: El nombre de usuario ya está en uso.'); } 
       else {setMsg("Error al registrarse: " + motive +"."); };
-      setError(true); // aquí puede haber más lógica para tratar los errores
+      setError(true);
       });
     }
 
