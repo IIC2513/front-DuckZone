@@ -37,10 +37,11 @@ function Signup() {
       {msg.length > 0 && <div className="successMsg"> {msg} </div>}
 
       {error && <div className="error">Hubo un error con el Registro, por favor trata nuevamente.</div>}
-
+      <h1>Estás a un paso de la batalla...</h1>
+      <h3>Debes registrarte para comenzar a jugar</h3>
       <form onSubmit={handleSubmit}>
         <label>
-          Username:
+          Username
           <input 
             type="text" 
             name="username"
@@ -50,7 +51,7 @@ function Signup() {
           />
         </label>
         <label>
-          Email:
+          Email
           <input 
             type="email" 
             name="email"
@@ -60,7 +61,7 @@ function Signup() {
           />
         </label>
         <label>
-          Password:
+          Contraseña
           <input 
             type="password" 
             name="password"
@@ -70,7 +71,7 @@ function Signup() {
           />
         </label>
         <label>
-          Duck Name:
+          Nombre para tu patito
           <input
             type="text" 
             name="duckname"
@@ -79,7 +80,7 @@ function Signup() {
             required
           />
           </label>
-        <input type="submit" value="Submit" />
+        <input type="submit" value="Regístrate" />
       </form>
     </div>
   );

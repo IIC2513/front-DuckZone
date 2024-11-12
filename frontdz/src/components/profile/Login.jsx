@@ -40,9 +40,11 @@ function Login() {
     <div className="Login">
       {msg.length > 0 && <div className="successMsg"> {msg} </div>}
       {error && <div className="error">Hubo un error con el Login, por favor trata nuevamente.</div>}
+      <h1>¡Bienvenido de vuelta!</h1>
+      <h3>Debes iniciar sesión para comenzar a jugar</h3>
       <form onSubmit={handleSubmit}>
-        <label>
-          Email:
+        <label className='textoinput'>
+          Email
           <input 
             type="email" 
             name="email"
@@ -52,7 +54,7 @@ function Login() {
           />
         </label>
         <label>
-          Password:
+          Contraseña
           <input 
             type="password" 
             name="password"
@@ -61,10 +63,10 @@ function Login() {
             required
           />
         </label>
-        <input type="submit" value="Enviar" />
+        <input type="submit" value="Iniciar sesión" />
       </form>
       <br></br>
-      <button onClick={() => window.location.href = '/signup'}>Registrarse</button>
+      <p>¿Patito nuevo? <a href='/signup'>Regístrate aquí.</a></p>
     </div>
   );
 }

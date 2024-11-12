@@ -1,19 +1,28 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap');
+
 .Login {
-    width: 500px;
+    width: 747px;
     margin: 0 auto;
     padding: 20px;
-    border: 1px solid #ddd;
+    border: 1px solid #ffffff;
     border-radius: 5px;
-    box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.1);
-    background-color: #f0faff;
+    background-color: #ffffff;
 
   }
 
   .Login form label {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    font-size: large;
+    font-weight: 300;
+    align-items: start;
   }
+
+.textoinput{
+  text-align: left;
+  color: #333;
+  align-items: start;
+}
 
   .Login form input[type="text"],
   .Login form input[type="email"],
@@ -22,22 +31,25 @@
     padding: 10px;
     margin-bottom: 20px;
     border: 1px solid #ddd;
-    background-color: #ffffff;
+    background-color: rgba(217, 217, 217, 1);
     color: #333;
-    border-radius: 3px;
+    border-radius: 10px;
   }
 
   .Login form input[type="submit"] {
-    background-color: #1e90ff;
+    background-color: rgba(109, 109, 109, 1);
     color: white;
     padding: 10px 20px;
     border: none;
-    border-radius: 3px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: large;
     cursor: pointer;
+    font-family: 'Outfit', sans-serif;
   }
 
   .Login form input[type="submit"]:hover {
-    background-color: #187bcd;
+    background-color: rgb(65, 65, 65);
   }
 
   .error {
