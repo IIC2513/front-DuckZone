@@ -31,15 +31,17 @@ function Login() {
         console.log(response);
         window.location.href = '/';
       }).catch((error) => {
-        console.error('An error occurred while trying to login:', error);
-        setError(true); 
+        console.error('An error occurred while trying to login:', error.response.data);
+        const motive = error.response.data
+        setMsg("Error al iniciar sesión: " + motive +".");
+        setError(true);
       });
   };
 
   return (
     <div className="Login">
-      {msg.length > 0 && <div className="successMsg"> {msg} </div>}
-      {error && <div className="error">Hubo un error con el Login, por favor trata nuevamente.</div>}
+      {(msg.length > 0 && !error) && <div className="successMsg"> {msg} </div>}
+      {error && <div className="error"> {msg} </div>}
       <h1>¡Bienvenido de vuelta!</h1>
       <h3>Debes iniciar sesión para comenzar a jugar</h3>
       <form onSubmit={handleSubmit}>

@@ -28,15 +28,17 @@ function Signup() {
         }, 2000);
       }).catch((error) => {      
       console.error('Ocurrió un error:', error);
+      const motive = error.response && error.response.data && error.response.data.errors && error.response.data.errors[0] ? error.response.data.errors[0].message : (error.response.data ? error.response.data : 'Unknown error');
+      if (motive === "username must be unique") { setMsg('Error al registrarse: El nombre de usuario ya está en uso.'); } 
+      else {setMsg("Error al registrarse: " + motive +"."); };
       setError(true);
       });
     }
 
   return (
     <div className="Login">
-      {msg.length > 0 && <div className="successMsg"> {msg} </div>}
-
-      {error && <div className="error">Hubo un error con el Registro, por favor trata nuevamente.</div>}
+      {(msg.length > 0 && !error) && <div className="successMsg"> {msg} </div>}
+      {error && <div className="error"> {msg} </div>}
       <h1>Estás a un paso de la batalla...</h1>
       <h3>Debes registrarte para comenzar a jugar</h3>
       <form onSubmit={handleSubmit}>
