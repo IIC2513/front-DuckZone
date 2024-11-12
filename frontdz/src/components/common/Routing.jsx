@@ -5,6 +5,7 @@ import NewGame from '../game/NewGame';
 import NewReport from '../profile/NewReport';
 import Cards from '../game/Cards';
 import Login from '../profile/Login';
+import Signup from '../profile/Signup';
 import App from './App';
 import Navbar from './navbar';
 import UserCheck from '../protected/UserCheck';
@@ -22,6 +23,7 @@ function Routing() {
                 <Route path="/newreport" element={<NewReport />} />
                 <Route path="/cards" element={<Cards />} />
                 <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<Signup/>} />
                 <Route path="/usercheck" element={<UserCheck />} />
                 <Route path="/admincheck" element={<AdminCheck />} />
                 <Route path="*" element={<h1>404 Not Found</h1>} />
