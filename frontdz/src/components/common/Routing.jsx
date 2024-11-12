@@ -8,6 +8,7 @@ import Login from '../profile/Login';
 import Signup from '../profile/Signup';
 import App from './App';
 import Navbar from './navbar';
+import About from './about';
 import UserCheck from '../protected/UserCheck';
 import AdminCheck from '../protected/AdminCheck';
 function Routing() {
@@ -23,6 +24,7 @@ function Routing() {
                 <Route path="/newreport" element={<NewReport />} />
                 <Route path="/cards" element={<Cards />} />
                 <Route path="/login" element={<Login />} />
+                <Route path="/about-us" element={<About />} />
                 <Route path="/signup" element={<Signup/>} />
                 <Route path="/usercheck" element={<UserCheck />} />
                 <Route path="/admincheck" element={<AdminCheck />} />
