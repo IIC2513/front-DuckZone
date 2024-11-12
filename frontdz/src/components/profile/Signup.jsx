@@ -28,7 +28,7 @@ function Signup() {
         }, 2000);
       }).catch((error) => {      
       console.error('Ocurrió un error:', error);
-      setError(true); // aquí puede haber más lógica para tratar los errores
+      setError(true);
       });
     }
 

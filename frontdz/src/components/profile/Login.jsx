@@ -22,9 +22,9 @@ function Login() {
         setMsg("Login exitoso!");
         // Recibimos el token y lo procesamos
         const access_token = response.data.access_token;
-        const is_admin = response.data.is_admin; // Extraer el rol de administrador
+        const is_admin = response.data.is_admin;
         localStorage.setItem('token', access_token);
-        localStorage.setItem('is_admin', is_admin); // Almacenar el rol de usuario
+        localStorage.setItem('is_admin', is_admin); 
         setToken(access_token);
         console.log("Se seteo el token: ", access_token);
         console.log("Es administrador: ", is_admin);
@@ -32,7 +32,7 @@ function Login() {
         window.location.href = '/';
       }).catch((error) => {
         console.error('An error occurred while trying to login:', error);
-        setError(true); // aquí puede haber más lógica para tratar los errores
+        setError(true); 
       });
   };
 
