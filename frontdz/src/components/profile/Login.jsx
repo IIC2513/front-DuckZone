@@ -29,6 +29,7 @@ function Login() {
         console.log("Se seteo el token: ", access_token);
         console.log("Es administrador: ", is_admin);
         console.log(response);
+        window.location.href = '/';
       }).catch((error) => {
         console.error('An error occurred while trying to login:', error);
         setError(true); // aquí puede haber más lógica para tratar los errores
@@ -62,6 +63,8 @@ function Login() {
         </label>
         <input type="submit" value="Enviar" />
       </form>
+      <br></br>
+      <button onClick={() => window.location.href = '/signup'}>Registrarse</button>
     </div>
   );
 }
