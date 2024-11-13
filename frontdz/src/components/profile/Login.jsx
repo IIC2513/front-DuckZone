@@ -40,8 +40,6 @@ function Login() {
 
   return (
     <div className="Login">
-      {(msg.length > 0 && !error) && <div className="successMsg"> {msg} </div>}
-      {error && <div className="error"> {msg} </div>}
       <h1>¡Bienvenido de vuelta!</h1>
       <h3>Debes iniciar sesión para comenzar a jugar</h3>
       <form onSubmit={handleSubmit}>
@@ -69,6 +67,8 @@ function Login() {
       </form>
       <br></br>
       <p>¿Patito nuevo? <a href='/signup'>Regístrate aquí.</a></p>
+    {(msg.length > 0 && !error) && <div className="successMsg"> {msg} </div>}
+    {error && <div className="error"> {msg} </div>}
     </div>
   );
 }

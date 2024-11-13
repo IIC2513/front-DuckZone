@@ -9,7 +9,6 @@ import Slider from "react-slick";
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
 
   const settings = {
     dots: true,
@@ -24,7 +23,7 @@ function App() {
   return (
     <>
       <h1>¡Bienvenido a DuckZone!</h1>
-      <a href='/newgame'><button className='jugarboton' href='/newgame'>JUGUEMOS</button></a>
+      <a href='/games'><button className='jugarboton' href='/games'>JUGUEMOS</button></a>
       <br></br>
       <img src={pato1} className='patito1'></img>
       <img src={pato2} className='patito2'></img>

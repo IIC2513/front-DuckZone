@@ -6,6 +6,9 @@ import NewReport from '../profile/NewReport';
 import Cards from '../game/Cards';
 import Login from '../profile/Login';
 import Signup from '../profile/Signup';
+import Games from '../game/Games';
+import NewPublic from '../game/NewPublic';
+import NewPrivate from '../game/NewPrivate';
 import App from './App';
 import Navbar from './navbar';
 import About from './about';
@@ -27,6 +30,9 @@ function Routing() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/about-us" element={<About />} />
                 <Route path="/signup" element={<Signup/>} />
+                <Route path="/games" element={<Games />} />
+                <Route path="/newpublic" element={<NewPublic />} />
+                <Route path="/newprivate" element={<NewPrivate />} />
                 <Route path="/usercheck" element={<UserCheck />} />
                 <Route path="/admincheck" element={<AdminCheck />} />
                 <Route path="/gameboard" element={<GameBoard />} />
