@@ -11,6 +11,7 @@ import Navbar from './navbar';
 import About from './about';
 import UserCheck from '../protected/UserCheck';
 import AdminCheck from '../protected/AdminCheck';
+import GameBoard from '../game/GameBoard';
 function Routing() {
     return(
         <>
@@ -28,6 +29,7 @@ function Routing() {
                 <Route path="/signup" element={<Signup/>} />
                 <Route path="/usercheck" element={<UserCheck />} />
                 <Route path="/admincheck" element={<AdminCheck />} />
+                <Route path="/gameboard" element={<GameBoard />} />
                 <Route path="*" element={<h1>404 Not Found</h1>} />
             </Routes>
         </BrowserRouter>

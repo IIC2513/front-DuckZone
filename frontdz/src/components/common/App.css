@@ -93,13 +93,6 @@ body {
   left: 300px;
 }
 
-.pantallajuego{
-  height: 500px;
-  width: 1000px;
-  background-color: rgba(217, 217, 217, 1);
-  border-radius: 3%;
-}
-
 .flexhor{
   display: flex;
   flex-direction: row;
@@ -274,4 +267,121 @@ details summary:hover {
 
 .log-button {
   cursor: pointer;
+}
+
+.game-board {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  background-color: grey;
+  padding: 20px;
+  border-radius: 10px;
+  box-sizing: border-box;
+}
+
+.top-row {
+  margin-bottom: 50px;
+}
+
+.middle-row {
+  margin: 50px 0;
+}
+
+.down-row {
+  margin-top: 50px;
+}
+
+.row {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.card_Game {
+    width: 100px;
+    height: 150px;
+    background-color: #808080;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    margin: 0 10px;
+    transition: transform 0.2s;
+}
+.card_Game.select {
+  width: 100px;
+  height: 150px;
+  background-color: #f1f1f1;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  margin: 0 10px;
+  transition: transform 0.2s;
+}
+
+.card_Game.selectable:hover {
+    transform: scale(1.05);
+    cursor: pointer;
+    background-color: #bfbfbf; 
+}
+
+.pantallajuego {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  height: 500vh;
+  width: 1000vw;
+  max-width: 1000px;
+  max-height: 600px;
+  background-color: rgba(217, 217, 217, 1);
+  border-radius: 3%;
+  box-sizing: border-box;
+  padding: 20px;
+}
+
+.player-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 20px;
+}
+
+.left-player {
+  margin-right: auto;
+  margin-bottom: 150px;
+}
+
+.right-player {
+  margin-left: auto;
+  margin-top: 150px;
+}
+
+.health-bar, .mana-bar {
+  width: 20px;
+  height: 100px;
+  background-color: #ccc;
+  border-radius: 10px;
+  margin: 5px 0;
+  position: relative;
+}
+
+.health-fill {
+  height: 100%;
+  background-color: rgb(15, 155, 8);
+  border-radius: 10px;
+}
+
+.mana-fill {
+  height: 100%;
+  background-color: rgb(204, 0, 255);
+  border-radius: 10px;
 }
