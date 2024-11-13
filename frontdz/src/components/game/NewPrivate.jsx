@@ -2,8 +2,9 @@ import { useState, useEffect, useContext } from 'react';
 import './GamesForm.css';
 import axios from 'axios';
 import { AuthContext } from '../auth/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
-const NewPublic = () => {
+const NewPrivate = () => {
     const [roomName, setRoomName] = useState('');
     const [roomPassword, setPassword] = useState('');
     const [error, setError] = useState(null);
@@ -12,6 +13,7 @@ const NewPublic = () => {
     const [userId, setUserId] = useState(null);
     const [userInfo, setUserInfo] = useState(null);
     const [msg, setMsg] = useState("");
+    const navigate = useNavigate();
   
     const config = {
       method: 'get',
@@ -67,10 +69,12 @@ const NewPublic = () => {
                     type: 'Private'
                 }
             });
-            setSuccess('Room created successfully!');
+            setSuccess('Sala creada exitosamente!');
             console.log('Room created:', response.data);
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            navigate(`../games/${response.data.game.id}`);
         } catch (err) {
-            setError('An error occurred while trying to create the room');
+            setError('Ha ocurrido un error al crear la sala.');
             console.error('Error creating room:', err);
         }
     };
@@ -102,9 +106,9 @@ const NewPublic = () => {
                 <input type="submit" value="Crear Sala" />
             </form>
             {error && <div className="error">{error}</div>}
-            {success && <div className="successMsg">{success}</div>}
+            {success && <div className="successMsg">{success}, redirigiendo...</div>}
         </div>
     );
 };
 
-export default NewPublic;
+export default NewPrivate;
