@@ -35,7 +35,7 @@ function Routing() {
                 <Route path="/newprivate" element={<NewPrivate />} />
                 <Route path="/usercheck" element={<UserCheck />} />
                 <Route path="/admincheck" element={<AdminCheck />} />
-                <Route path="/gameboard" element={<GameBoard />} />
+                <Route path="/games/:id" element={<GameBoard />} /> 
                 <Route path="*" element={<h1>404 Not Found</h1>} />
             </Routes>
         </BrowserRouter>

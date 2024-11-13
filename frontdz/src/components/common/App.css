@@ -40,12 +40,16 @@ nav {
   align-items: center;
   margin: 0;
   background-color: #ffffff;
-  padding: 1rem;
+  padding: 0.3rem;
   width: 100%;
-  top:0;
+  top: 0;
   left: 0;
   position: fixed;
   z-index: 1000;
+}
+
+body {
+  padding-top: 4rem;
 }
 
 
@@ -56,7 +60,7 @@ nav a {
   font-family: 'Outfit', sans-serif;
 }
 .aaaa {
-  width: 100px;
+  width: 60px;
   height: auto;
   bottom: 0;
 }
@@ -64,10 +68,6 @@ nav a {
   position: absolute;
   margin-bottom: 0;
 } 
-
-body {
-  padding-top: 2rem; /* Añade un padding para evitar que el contenido quede debajo del navbar */
-}
 
 .slick-prev, .slick-next {
   z-index: 1;
@@ -351,6 +351,13 @@ details summary:hover {
   border-radius: 3%;
   box-sizing: border-box;
   padding: 20px;
+}
+
+.pantallaseleccion{
+  height: 500px;
+  width: 1000px;
+  background-color: rgba(217, 217, 217, 1);
+  border-radius: 3%;
 }
 
 .player-info {

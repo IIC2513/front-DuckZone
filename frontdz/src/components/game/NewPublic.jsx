@@ -2,6 +2,7 @@ import { useState, useEffect, useContext } from 'react';
 import './GamesForm.css';
 import axios from 'axios';
 import { AuthContext } from '../auth/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const NewPublic = () => {
     const [roomName, setRoomName] = useState('');
@@ -11,6 +12,7 @@ const NewPublic = () => {
     const [msg, setMsg] = useState("");
     const [userId, setUserId] = useState(null);
     const [userInfo, setUserInfo] = useState(null);
+    const navigate = useNavigate();
   
     const config = {
       method: 'get',
@@ -61,10 +63,12 @@ const NewPublic = () => {
                     type: 'Standard' // Tipo de juego por defecto
                 }
             });
-            setSuccess('Room created successfully!');
+            setSuccess('Sala creada existosamente!');
             console.log('Room created:', response.data);
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            navigate(`../games/${response.data.game.id}`);
         } catch (err) {
-            setError('An error occurred while trying to create the room');
+            setError('Ha ocurrido un error al crear la sala.');
             console.error('Error creating room:', err);
         }
     };
@@ -86,7 +90,7 @@ const NewPublic = () => {
                 <input type="submit" value="Crear Sala" />
             </form>
             {error && <div className="error">{error}</div>}
-            {success && <div className="successMsg">{success}</div>}
+            {success && <div className="successMsg">{success}, redirigiendo...</div>}
         </div>
     );
 };

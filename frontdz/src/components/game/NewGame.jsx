@@ -13,7 +13,7 @@ function NewGame() {
         <>
         <br></br>
         <br></br>
-        <div className='pantallajuego'>
+        <div className='pantallaseleccion'>
             <br></br><h1 className='nuevap'>NUEVA PARTIDA</h1>
             <h3 className='mod'>Escoge la modalidad en la que deseas jugar</h3>
             <br />
