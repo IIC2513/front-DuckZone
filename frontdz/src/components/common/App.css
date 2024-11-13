@@ -164,14 +164,30 @@ body {
 }
 
 .textob {
-  position: absolute;
-  top: 41%; /* Ajusta según sea necesario */
-  left: 58%; /* Ajusta según sea necesario */
+  position: relative;
+  bottom: 70%; /* Ajusta según sea necesario */
+  left: 20%; /* Ajusta según sea necesario */
   z-index: 2; /* Asegura que el texto esté delante de la imagen */
   color: rgb(0, 0, 0); /* Color del texto */
-  font-size: 24px; /* Tamaño del texto */
+  font-size: 24px; /* Tamaño del tex to */
   text-align: left;
   font-weight: 1000;
+  margin-left: 0%;
+  margin-right: 5%;
+}
+
+.textob1 {
+  position: relative;
+  bottom: 80%; 
+  left: 20%; 
+  z-index: 2; 
+  color: rgb(0, 0, 0); 
+  font-size: 14px; 
+  text-align: left;
+  font-weight: 500;
+  margin-left: 0%;
+  margin-right: 5%;
+  width: 20em;
 }
 
 details summary {
@@ -185,17 +201,6 @@ details summary {
 
 details summary:hover {
   background-color: #e0e0e0; /* Cambia el color de fondo al pasar el cursor */
-}
-
-.textob1 {
-  position: absolute;
-  top: 45%; 
-  left: 58%; 
-  z-index: 2; 
-  color: rgb(0, 0, 0); 
-  font-size: 24px; 
-  text-align: left;
-  font-weight: 500;
 }
 
 .esquema {

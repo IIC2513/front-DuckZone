@@ -37,8 +37,6 @@ function Signup() {
 
   return (
     <div className="Login">
-      {(msg.length > 0 && !error) && <div className="successMsg"> {msg} </div>}
-      {error && <div className="error"> {msg} </div>}
       <h1>Estás a un paso de la batalla...</h1>
       <h3>Debes registrarte para comenzar a jugar</h3>
       <form onSubmit={handleSubmit}>
@@ -84,6 +82,8 @@ function Signup() {
           </label>
         <input type="submit" value="Regístrate" />
       </form>
+    {(msg.length > 0 && !error) && <div className="successMsg"> {msg} </div>}
+    {error && <div className="error"> {msg} </div>}
     </div>
   );
 }
