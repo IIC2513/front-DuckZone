@@ -9,6 +9,52 @@
   text-align: center;
 }
 
+.container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.table {
+  width: 80%;
+  border-collapse: collapse;
+}
+
+.header {
+  border-bottom: 2px solid black;
+  padding: 10px;
+  text-align: left;
+  font-weight: bold;
+}
+
+.cell {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.user {
+  display: flex;
+  align-items: center;
+}
+
+.avatar {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: #ccc;
+  margin-right: 10px;
+}
+
+.button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+
 .patito1{
   position: absolute;
   height: 500px;

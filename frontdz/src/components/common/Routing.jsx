@@ -4,10 +4,12 @@ import Profile from '../profile/Profile';
 import NewGame from '../game/NewGame';
 import NewReport from '../profile/NewReport';
 import Cards from '../game/Cards';
+import Board from '../game/Board';
 import Login from '../profile/Login';
 import Signup from '../profile/Signup';
 import App from './App';
 import Navbar from './navbar';
+import Ranking from './ranking';
 import About from './about';
 import UserCheck from '../protected/UserCheck';
 import AdminCheck from '../protected/AdminCheck';
@@ -23,6 +25,8 @@ function Routing() {
                 <Route path="/newgame" element={<NewGame />} />
                 <Route path="/newreport" element={<NewReport />} />
                 <Route path="/cards" element={<Cards />} />
+                <Route path="/ranking" element={<Ranking />} />
+                <Route path="/board" element={<Board />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/about-us" element={<About />} />
                 <Route path="/signup" element={<Signup/>} />

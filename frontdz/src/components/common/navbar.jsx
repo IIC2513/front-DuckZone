@@ -23,7 +23,7 @@ function Navbar() {
             <a href="/" ><img src={logo} alt="Logo" className="aaaa"/></a>
             <div className="lefttext">
                 <a href="/rules">¿Cómo jugar?</a>
-                <a href="/newgame">Ranking</a>
+                <a href="/ranking">Ranking</a>
                 {isLoggedIn && (
                     <a href="/profile" className="profile-link">
                     <span>Mi perfil</span>
