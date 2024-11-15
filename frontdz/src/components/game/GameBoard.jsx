@@ -1,30 +1,49 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { useParams } from 'react-router-dom';
+import { AuthContext } from '../auth/AuthContext';
+import axios from 'axios';
 
 function GameBoard() {
 
-
+    const { token } = useContext(AuthContext)
     const { id } = useParams();
     const gameId = parseInt(id, 10);
     const [game, setGame] = React.useState(null);
-    const [playerOne, setPlayerOne] = React.useState(null);
+    const [userId, setUserId] = useState(null);
+    const [msg, setMsg] = useState("");
+    const [userPlayer, setUserPlayer] = React.useState(null);
+    const [otherPlayer, setOtherPlayer] = React.useState(null);
     const [cardOne, setCardOne] = React.useState(null);
     const [cardTwo, setCardTwo] = React.useState(null);
     const [cardThree, setCardThree] = React.useState(null);
     const [cardFour, setCardFour] = React.useState(null);
     const [cardFive, setCardFive] = React.useState(null);
-
-    useEffect(() => {
-        console.log('Game ID:', gameId);
-    }, [gameId]);
-
+    const config = {
+        method: 'get',
+        url: `${import.meta.env.VITE_BACKEND_URL}/scope-example/protecteduser`,
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+        }
+      };
+    
+      useEffect(() => {
+          axios(config)
+              .then((response) => {
+                  setMsg(response.data.message);
+                  setUserId(response.data.user.sub);
+              })
+              .catch((error) => {
+                  console.error("Invalid token");
+                  console.error(error);
+                  setMsg("not logged");
+              });
+      }, []);
 
     useEffect(() => {
         async function fetchGame() {
             try {
                 const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/games/${gameId}`);
                 const data = await response.json();
-                console.log('Game data:', data);
                 setGame(data);
             } catch (error) {
                 console.error('Error fetching game data:', error);
@@ -34,30 +53,34 @@ function GameBoard() {
         fetchGame();
     }, [gameId]);
 
-    const playerOneId = game?.playerOne;
-
     useEffect(() => {
-        async function fetchPlayerOne() {
-            if (playerOneId) {
+        async function fetchPlayers() {
+            if (game) {
                 try {
-                    const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${playerOneId}`);
-                    const data = await response.json();
-                    console.log('Player One data:', data);
-                    setPlayerOne(data);
+                    const playerOneResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${game.playerOne}`);
+                    const playerOneData = await playerOneResponse.json();
+                    const playerTwoResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${game.playerTwo}`);
+                    const playerTwoData = await playerTwoResponse.json();
+                    if (playerOneData.userId == userId) {
+                        setUserPlayer(playerOneData);
+                        setOtherPlayer(playerTwoData);
+                    } else if (playerTwoData.userId == userId) {
+                        setUserPlayer(playerTwoData);
+                        setOtherPlayer(playerOneData);
+                    }
                 } catch (error) {
-                    console.error('Error fetching player one data:', error);
+                    console.error('Error fetching players data:', error);
                 }
             }
         }
 
-        fetchPlayerOne();
-    }, [playerOneId]);
+        fetchPlayers();
+    }, [game, userId]);
 
     async function fetchCard(cardId) {
         try {
             const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/cards/${cardId}`);
             const data = await response.json();
-            console.log('Card data:', data);
             return data;
         } catch (error) {
             console.error('Error fetching card data:', error);
@@ -67,13 +90,13 @@ function GameBoard() {
 
     useEffect(() => {
         async function fetchPlayerCards() {
-            if (playerOne) {
+            if (userPlayer) {
                 const cardIds = [
-                    playerOne.cardOneId,
-                    playerOne.cardTwoId,
-                    playerOne.cardThreeId,
-                    playerOne.cardFourId,
-                    playerOne.cardFiveId,
+                    userPlayer.cardOneId,
+                    userPlayer.cardTwoId,
+                    userPlayer.cardThreeId,
+                    userPlayer.cardFourId,
+                    userPlayer.cardFiveId,
                 ];
 
                 const validCardIds = cardIds.filter(cardId => cardId !== null && cardId !== undefined);
@@ -89,9 +112,7 @@ function GameBoard() {
         }
 
         fetchPlayerCards();
-    }, [playerOne]);
-
-
+    }, [userPlayer]);
 
     return (
         <>
@@ -100,10 +121,10 @@ function GameBoard() {
             <div className='pantallajuego'>
                 <div className="player-info left-player">
                     <div className="health-bar">
-                        <div className="health-fill" style={{ height: `${playerOne?.health_points / 50}` }}></div>
+                        <div className="health-fill" style={{ height: `${otherPlayer?.health_points / 50 * 100}%` }}></div>
                     </div>
                     <div className="mana-bar">
-                        <div className="mana-fill" style={{ height: '60%' }}></div>
+                        <div className="mana-fill" style={{ height: `${otherPlayer?.actual_mana / 9 * 100}%` }}></div>
                     </div>
                 </div>
                 <div className='gameboard'>
@@ -115,6 +136,7 @@ function GameBoard() {
                         <div className="card_Game"></div>
                     </div>
                     <div className="row middle-row">
+                        <div className="card_Game select"> </div>
                         <div className="card_Game select"> </div>
                     </div>
                     <div className="row down-row">
@@ -147,10 +169,10 @@ function GameBoard() {
                 </div>
                 <div className="player-info right-player">
                     <div className="health-bar">
-                        <div className="health-fill" style={{ height: `${playerOne?.health_points / 50}` }}></div>
+                        <div className="health-fill" style={{ height: `${userPlayer?.health_points / 50 * 100}%` }}></div>
                     </div>
                     <div className="mana-bar">
-                        <div className="mana-fill" style={{ height: '50%' }}></div>
+                        <div className="mana-fill" style={{ height: `${otherPlayer?.actual_mana / 9 * 100}%` }}></div>
                     </div>
                 </div>
             </div>    
