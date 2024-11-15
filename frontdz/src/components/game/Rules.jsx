@@ -9,7 +9,7 @@ function Rules() {
             <br></br>
 
             <h1>Reglas del Juego</h1>
-            <div className='left container'>
+            <div className='left containera'>
 
                 <details>
                     <summary>Objetivo del Juego</summary>
