@@ -119,28 +119,39 @@ function GameBoard() {
                     </div>
                     <div className="row down-row">
                         {cardOne && (
-                            <div className="card_Game selectable">
-                                {cardOne.name} Mana Cost: {cardOne.mana_cost !== undefined ? cardOne.mana_cost : 'N/A'} {cardOne.spell_class ? '' : `ATK Points: ${cardOne.atk_points || 'N/A'}`} Type: {cardOne.type || 'N/A'}
+                            <div className={`card_Game selectable ${cardOne.type}`}>
+                                <p className='mana'>{cardOne.mana_cost}</p>
+                                <p className='atk'>{cardOne.atk_points}</p>
+                                <p className='name'>{cardOne.name} </p>
                             </div>
                         )}
                         {cardTwo && (
-                            <div className="card_Game selectable">
-                                {cardTwo.name} Mana Cost: {cardTwo.mana_cost !== undefined ? cardTwo.mana_cost : 'N/A'} {cardTwo.spell_class ? '' : `ATK Points: ${cardTwo.atk_points || 'N/A'}`} Type: {cardTwo.type || 'N/A'}
+                            <div className={`card_Game selectable ${cardTwo.type}`}>
+                                <p className='mana'>{cardTwo.mana_cost}</p>
+                                <p className='atk'>{cardTwo.atk_points}</p>
+                                <p className='name'>{cardTwo.name} </p>
+                                
                             </div>
                         )}
                         {cardThree && (
-                            <div className="card_Game selectable">
-                                {cardThree.name} Mana Cost: {cardThree.mana_cost !== undefined ? cardThree.mana_cost : 'N/A'} {cardThree.spell_class ? '' : `ATK Points: ${cardThree.atk_points || 'N/A'}`} Type: {cardThree.type || 'N/A'}
+                            <div className={`card_Game selectable ${cardThree.type}`}>
+                                <p className='mana'>{cardThree.mana_cost}</p>
+                                <p className='atk'>{cardThree.atk_points}</p>
+                                <p className='name'>{cardThree.name} </p>
                             </div>
                         )}
                         {cardFour && (
-                            <div className="card_Game selectable">
-                                {cardFour.name} Mana Cost: {cardFour.mana_cost !== undefined ? cardFour.mana_cost : 'N/A'} {cardFour.spell_class ? '' : `ATK Points: ${cardFour.atk_points || 'N/A'}`} Type: {cardFour.type || 'N/A'}
+                            <div className={`card_Game selectable ${cardFour.type}`}>
+                                <p className='mana'>{cardFour.mana_cost}</p>
+                                <p className='atk'>{cardFour.atk_points}</p>
+                                <p className='name'>{cardFour.name} </p>
                             </div>
                         )}
                         {cardFive && (
-                            <div className="card_Game selectable">
-                                {cardFive.name} Mana Cost: {cardFive.mana_cost !== undefined ? cardFive.mana_cost : 'N/A'} {cardFive.spell_class ? '' : `ATK Points: ${cardFive.atk_points || 'N/A'}`} Type: {cardFive.type || 'N/A'}
+                            <div className={`card_Game selectable ${cardFive.type}`}>
+                                <p className='mana'>{cardFive.mana_cost}</p>
+                                <p className='atk'>{cardFive.atk_points}</p>
+                                <p className='name'>{cardFive.name}</p>
                             </div>
                         )}
                     </div>

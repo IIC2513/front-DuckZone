@@ -352,21 +352,19 @@ details summary:hover {
 }
 
 .card_Game {
-    width: 100px;
-    height: 150px;
+    width: 120px;
+    height: 170px;
     background-color: #808080;
     color: white;
     display: flex;
     justify-content: center;
     align-items: center;
-    border-radius: 10px;
+    border-radius: 5px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     margin: 0 10px;
     transition: transform 0.2s;
 }
 .card_Game.select {
-  width: 100px;
-  height: 150px;
   background-color: #f1f1f1;
   color: white;
   display: flex;
@@ -376,6 +374,62 @@ details summary:hover {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   margin: 0 10px;
   transition: transform 0.2s;
+}
+
+.mana{
+  bottom: 33%;
+  left: 15%;
+  margin-top: 0;
+  position: relative;
+}
+
+.atk{
+  bottom: 33%;
+  left: 70%;
+  margin-top: 0;
+  position: relative;
+}
+
+.name{
+  font-size: 10px;
+  text-align: center;
+  font-weight: 500;
+  bottom: -18%;
+  margin-right: 1rem;
+  left: 0;
+  width: 89px;
+  position: relative;
+  align-items: center;
+}
+
+.hielo{
+  background-image: url('../../assets/imgs/fondo-cartas/hielo.png'); 
+  background-size: cover; 
+  background-position: center; 
+}
+
+.fuego{
+  background-image: url('../../assets/imgs/fondo-cartas/fuego.png'); 
+  background-size: cover; 
+  background-position: center; 
+}
+
+.agua{
+  background-image: url('../../assets/imgs/fondo-cartas/agua.png'); 
+  background-size: cover; 
+  background-position: center; 
+}
+
+.tierra{
+  background-image: url('../../assets/imgs/fondo-cartas/tierra.png'); 
+  background-size: cover; 
+  background-position: center; 
+}
+
+.aire {
+  background-image: url('../../assets/imgs/fondo-cartas/aire.png'); 
+  background-size: cover; 
+  background-position: center; 
 }
 
 .card_Game.selectable:hover {
@@ -391,8 +445,8 @@ details summary:hover {
   justify-content: center;
   height: 500vh;
   width: 1000vw;
-  max-width: 1000px;
-  max-height: 600px;
+  max-width: 1100px;
+  max-height: 650px;
   background-color: rgba(217, 217, 217, 1);
   border-radius: 3%;
   box-sizing: border-box;
