@@ -147,6 +147,7 @@ function GameBoard() {
                                 <p className='name'>{cardOne.name} </p>
                             </div>
                         )}
+                        {!cardOne && <div className="card_Game"></div>}
                         {cardTwo && (
                             <div className={`card_Game selectable ${cardTwo.type}`}>
                                 <p className='mana'>{cardTwo.mana_cost}</p>
@@ -155,6 +156,7 @@ function GameBoard() {
                                 
                             </div>
                         )}
+                        {!cardTwo && <div className="card_Game"></div>}
                         {cardThree && (
                             <div className={`card_Game selectable ${cardThree.type}`}>
                                 <p className='mana'>{cardThree.mana_cost}</p>
@@ -162,6 +164,7 @@ function GameBoard() {
                                 <p className='name'>{cardThree.name} </p>
                             </div>
                         )}
+                        {!cardThree && <div className="card_Game"></div>}
                         {cardFour && (
                             <div className={`card_Game selectable ${cardFour.type}`}>
                                 <p className='mana'>{cardFour.mana_cost}</p>
@@ -169,6 +172,7 @@ function GameBoard() {
                                 <p className='name'>{cardFour.name} </p>
                             </div>
                         )}
+                        {!cardFour && <div className="card_Game"></div>}
                         {cardFive && (
                             <div className={`card_Game selectable ${cardFive.type}`}>
                                 <p className='mana'>{cardFive.mana_cost}</p>
@@ -176,6 +180,7 @@ function GameBoard() {
                                 <p className='name'>{cardFive.name}</p>
                             </div>
                         )}
+                        {!cardFive && <div className="card_Game"></div>}
                     </div>
                 </div>
                 <div className="player-info right-player">
@@ -187,6 +192,21 @@ function GameBoard() {
                     </div>
                 </div>
             </div>    
+            <br/>
+            <div className="player-count">
+                <p>Players: {game?.player_count}/2</p>
+            </div>
+            {userPlayer?.id === game?.playerOne && game?.started === false && (
+            <button onClick={async () => {
+                try {
+                    await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${userPlayer.id}/refill_hand`, { method: 'PATCH' });
+                    await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${otherPlayer.id}/refill_hand`, { method: 'PATCH' });
+                    console.log('Hand refilled for both players');
+                } catch (error) {
+                    console.error('Error refilling hand:', error);
+                }
+            }} disabled={game?.player_count !== 2}>Comenzar Partida</button>
+            )}
         </>
     );
     }
