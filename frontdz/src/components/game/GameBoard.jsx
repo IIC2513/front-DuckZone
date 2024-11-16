@@ -201,6 +201,7 @@ function GameBoard() {
                 try {
                     await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${userPlayer.id}/refill_hand`, { method: 'PATCH' });
                     await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${otherPlayer.id}/refill_hand`, { method: 'PATCH' });
+                    await fetch(`${import.meta.env.VITE_BACKEND_URL}/games/start/${gameId}`, { method: 'PATCH' });
                     console.log('Hand refilled for both players');
                 } catch (error) {
                     console.error('Error refilling hand:', error);
