@@ -2,9 +2,11 @@ import React, { useState, useContext } from 'react';
 import { AuthContext } from '../auth/AuthContext';
 import axios from 'axios';
 import './Login.css';
+import { SocketContext } from '../sockets/SocketContext';
 
 function Login() {
   const { token, setToken } = useContext(AuthContext);
+  const { connectSocket } = useContext(SocketContext);
   const [mail, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(false);
@@ -19,6 +21,7 @@ function Login() {
       }).then((response) => {
         console.log('Login successful');
         setError(false);
+        connectSocket(response.user_id);
         setMsg("Login exitoso!");
         // Recibimos el token y lo procesamos
         const access_token = response.data.access_token;
