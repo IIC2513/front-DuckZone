@@ -1,10 +1,11 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom"; 
 import { AuthContext } from "../auth/AuthContext";
 import { fetchGames } from "../api/sala-de-espera";
 import ToastManager from "../common/toasts/Toast";
 import "./Games.css";
 import axios from "axios";
+import io from "socket.io-client";
 
 const Games = () => {
     const [games, setGames] = useState([]);
@@ -14,6 +15,7 @@ const Games = () => {
     const [userId, setUserId] = useState(null);
     const [msg, setMsg] = useState("");
     const navigate = useNavigate();
+    const socket = useRef(null);
 
     const config = {
         method: 'get',
@@ -22,10 +24,47 @@ const Games = () => {
           'Authorization': `Bearer ${token}`,
         }
       };
-  
 
     useEffect(() => {
-        console.log("useEffect ejecutado");
+        const connectSocket = () => {
+            socket.current = io(import.meta.env.VITE_BACKEND_URL, {
+                transports: ['websocket'],
+                reconnectionAttempts: 5,
+                reconnectionDelay: 1000,
+            });
+
+            socket.current.on("connect_error", (error) => {
+                console.error("WebSocket connection error:", error);
+                addToast("Error de conexión WebSocket", "error");
+            });
+
+            socket.current.on("player_count_updated", handlePlayerCountUpdated);
+            socket.current.on("new_game_created", handleNewGameCreated);
+
+            socket.current.on("disconnect", () => {
+                console.warn("WebSocket disconnected. Attempting to reconnect...");
+            });
+
+            socket.current.on("reconnect_failed", () => {
+                console.error("WebSocket reconnection failed.");
+                addToast("Error de reconexión WebSocket", "error");
+            });
+
+            socket.current.on("close", (reason) => {
+                if (reason === "transport close") {
+                    console.warn("WebSocket closed before the connection was established.");
+                }
+            });
+        };
+
+        const handlePlayerCountUpdated = (gameId, playerCount) => {
+            setGames(games => games.map(game => game.id === gameId ? { ...game, player_count: playerCount } : game));
+        };
+
+        const handleNewGameCreated = (newGame) => {
+            setGames(prevGames => [...prevGames, newGame]);
+        };
+
         const loadGames = async () => {
             try {
                 const data = await fetchGames();
@@ -36,8 +75,17 @@ const Games = () => {
             }
         };
 
+        connectSocket();
         loadGames();
-    }, []);
+
+        return () => {
+            if (socket.current) {
+                socket.current.off("player_count_updated", handlePlayerCountUpdated);
+                socket.current.off("new_game_created", handleNewGameCreated);
+                // No desconectamos el socket aquí
+            }
+        };
+    }, []); // Empty dependency array to run only once on mount
 
     useEffect(() => {
         axios(config)
@@ -51,7 +99,7 @@ const Games = () => {
                 console.error(error);
                 setMsg("not logged");
             });
-    }, []);
+    }, [token]);
 
     useEffect(() => {
         if (userId) {
@@ -71,19 +119,19 @@ const Games = () => {
         }
     }, [userId]);
 
-    const addToast = (message, type) => {
-        setToasts((prevToasts) => [...prevToasts, { message, type }]);
-    };
+    useEffect(() => {
+        console.log("games", games);
+    }, [games]);
 
     const handleJoinGame = async (game) => {
         if (!userInfo || !userInfo.id) {
             addToast("Usuario no autenticado", "error");
             return;
-        };
+        }
         if (game.player_count >= 2) {
             addToast("Juego lleno", "error");
             return;
-        };
+        }
         try {
             await axios.patch(`${import.meta.env.VITE_BACKEND_URL}/games/update_player_two/${game.id}`, {
                 newId: userInfo.id
@@ -91,6 +139,9 @@ const Games = () => {
             await axios.patch(`${import.meta.env.VITE_BACKEND_URL}/games/update_player_count/${game.id}`, {
                 player_count: game.player_count + 1
             });
+
+            setGames(games => games.map(g => g.id === game.id ? { ...g, player_count: game.player_count + 1 } : g));
+
             navigate(`/games/${game.id}`);
         } catch (error) {
             console.error("Error joining game:", error);
@@ -98,8 +149,10 @@ const Games = () => {
         }
     };
 
+    const addToast = (message, type) => {
+        setToasts([...toasts, { message, type }]);
+    };
 
-    console.log("games", games);
     return (
         <div className="pregame">
             <h1>Salas de Espera</h1>
@@ -122,4 +175,4 @@ const Games = () => {
     );
 };
 
-export default Games; 
+export default Games;
