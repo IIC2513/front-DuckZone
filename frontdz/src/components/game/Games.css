@@ -1,6 +1,6 @@
 .pregame {
-    max-width: 800px;
-    margin: 0 auto;
+    width: 180%;
+    margin: 0 -40%;
     padding: 20px;
     text-align: center;
     background-color: #f8f9fa;
@@ -52,7 +52,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 100%;
+    width: 94%;
 }
 
 .listedGame {
