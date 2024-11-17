@@ -57,8 +57,8 @@ const Games = () => {
             });
         };
 
-        const handlePlayerCountUpdated = (gameId, playerCount) => {
-            setGames(games => games.map(game => game.id === gameId ? { ...game, player_count: playerCount } : game));
+        const handlePlayerCountUpdated = (updatedGame) => {
+            setGames(games => games.map(game => game.id === updatedGame.id ? updatedGame : game));
         };
 
         const handleNewGameCreated = (newGame) => {
