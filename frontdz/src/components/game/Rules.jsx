@@ -41,7 +41,7 @@ function Rules() {
                                 de los patos puede verse afectado por el uso de cartas de hechizo.
                             </p>
                         </li>
-                        <li>
+                        {/*<li>
                             <h3>Cartas de Hechizo</h3>
                             <p>
                                 Las cartas de hechizo solo pueden ser usadas por el jugador atacante (en caso de tener alguna disponible).
@@ -69,7 +69,7 @@ function Rules() {
                                 </p>
                                 </li>
                             </ul>
-                        </li>
+                        </li>*/}
                     </ul>
                 </details>
 
