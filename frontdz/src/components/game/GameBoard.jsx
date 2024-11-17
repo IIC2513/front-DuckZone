@@ -1,7 +1,8 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState, useContext, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { AuthContext } from '../auth/AuthContext';
 import axios from 'axios';
+import io from "socket.io-client";
 
 function GameBoard() {
 
@@ -18,15 +19,74 @@ function GameBoard() {
     const [cardThree, setCardThree] = React.useState(null);
     const [cardFour, setCardFour] = React.useState(null);
     const [cardFive, setCardFive] = React.useState(null);
+    const socket = useRef(null);
     const config = {
         method: 'get',
         url: `${import.meta.env.VITE_BACKEND_URL}/scope-example/protecteduser`,
         headers: { 
           'Authorization': `Bearer ${token}`,
         }
-      };
+    };
     
-      useEffect(() => {
+    useEffect(() => {
+        const connectSocket = () => {
+            socket.current = io(import.meta.env.VITE_BACKEND_URL, {
+                transports: ['websocket'],
+                reconnectionAttempts: 5,
+                reconnectionDelay: 1000,
+            });
+
+            socket.current.on("connect_error", (error) => {
+                console.error("WebSocket connection error:", error);
+                addToast("Error de conexión WebSocket", "error");
+            });
+
+            socket.current.on("game_updated", handleGameUpdated);
+            socket.current.on("player_updated", handlePlayerUpdated);
+
+            socket.current.on("disconnect", () => {
+                console.warn("WebSocket disconnected. Attempting to reconnect...");
+            });
+
+            socket.current.on("reconnect_failed", () => {
+                console.error("WebSocket reconnection failed.");
+                addToast("Error de reconexión WebSocket", "error");
+            });
+
+            socket.current.on("close", (reason) => {
+                if (reason === "transport close") {
+                    console.warn("WebSocket closed before the connection was established.");
+                }
+            });
+        };
+
+        const handleGameUpdated = (updatedGame) => {
+            if (updatedGame.id === gameId) {
+                setGame(updatedGame);
+                console.log('Game updated:', updatedGame);
+            }
+        };
+
+        const handlePlayerUpdated = (updatedPlayer) => {
+            if (updatedPlayer.id === userPlayer?.id) {
+                setUserPlayer(updatedPlayer);
+            } else if (updatedPlayer.id === otherPlayer?.id) {
+                setOtherPlayer(updatedPlayer);
+            }
+        };
+
+        connectSocket();
+
+        return () => {
+            if (socket.current) {
+                socket.current.off("game_updated", handleGameUpdated);
+                socket.current.off("player_updated", handlePlayerUpdated);
+                // No desconectamos el socket aquí
+            }
+        };
+    }, [gameId, userPlayer, otherPlayer]); // Dependencies to re-run the effect if these change
+    
+    useEffect(() => {
           axios(config)
               .then((response) => {
                   setMsg(response.data.message);
