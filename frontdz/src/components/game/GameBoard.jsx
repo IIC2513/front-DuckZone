@@ -19,6 +19,8 @@ function GameBoard() {
     const [cardThree, setCardThree] = React.useState(null);
     const [cardFour, setCardFour] = React.useState(null);
     const [cardFive, setCardFive] = React.useState(null);
+    const [cardOneGame, setCardOneGame] = React.useState(null);
+    const [cardTwoGame, setCardTwoGame] = React.useState(null);
     const socket = useRef(null);
     const config = {
         method: 'get',
@@ -157,22 +159,26 @@ function GameBoard() {
                     userPlayer.cardThreeId,
                     userPlayer.cardFourId,
                     userPlayer.cardFiveId,
+                    game.card_1,
+                    game.card_2,
                 ];
 
-                const validCardIds = cardIds.filter(cardId => cardId !== null && cardId !== undefined);
-                const cardPromises = validCardIds.map(cardId => fetchCard(cardId));
-                const cards = await Promise.all(cardPromises.map(p => p.catch(() => null)));
+                const cardPromises = cardIds.map(cardId => cardId ? fetchCard(cardId).catch(() => null) : Promise.resolve(null));
+                const cards = await Promise.all(cardPromises);
 
                 setCardOne(cards[0]);
                 setCardTwo(cards[1]);
                 setCardThree(cards[2]);
                 setCardFour(cards[3]);
                 setCardFive(cards[4]);
+                setCardOneGame(cards[5]);
+                setCardTwoGame(cards[6]);
+                console.log('Player cards:', cardIds);
             }
         }
 
         fetchPlayerCards();
-    }, [userPlayer]);
+    }, [userPlayer, game]);
 
     return (
         <>
@@ -196,49 +202,199 @@ function GameBoard() {
                         <div className="card_Game"></div>
                     </div>
                     <div className="row middle-row">
-                        <div className="card_Game select"> </div>
-                        <div className="card_Game select"> </div>
+                        {userPlayer?.id === game?.playerOne ? (
+                            <>
+                                {game?.card_2 ? (
+                                    <div className={`card_Game ${cardTwoGame?.type}`}>
+                                        <p className='mana'>{cardTwoGame?.mana_cost}</p>
+                                        <p className='atk'>{cardTwoGame?.atk_points}</p>
+                                        <p className='name'>{cardTwoGame?.name}</p>
+                                    </div>
+                                ) : (
+                                    <div className="card_Game select"></div>
+                                )}
+                                {game?.card_1 ? (
+                                    <div className={`card_Game ${cardOneGame?.type}`}>
+                                        <p className='mana'>{cardOneGame?.mana_cost}</p>
+                                        <p className='atk'>{cardOneGame?.atk_points}</p>
+                                        <p className='name'>{cardOneGame?.name}</p>
+                                    </div>
+                                ) : (
+                                    <div className="card_Game select"></div>
+                                )}
+                            </>
+                        ) : (
+                            <>
+                                {game?.card_1 ? (
+                                    <div className={`card_Game ${cardOneGame?.type}`}>
+                                        <p className='mana'>{cardOneGame?.mana_cost}</p>
+                                        <p className='atk'>{cardOneGame?.atk_points}</p>
+                                        <p className='name'>{cardOneGame?.name}</p>
+                                    </div>
+                                ) : (
+                                    <div className="card_Game select"></div>
+                                )}
+                                {game?.card_2 ? (
+                                    <div className={`card_Game ${cardTwoGame?.type}`}>
+                                        <p className='mana'>{cardTwoGame?.mana_cost}</p>
+                                        <p className='atk'>{cardTwoGame?.atk_points}</p>
+                                        <p className='name'>{cardTwoGame?.name}</p>
+                                    </div>
+                                ) : (
+                                    <div className="card_Game select"></div>
+                                )}
+                            </>
+                        )}
                     </div>
                     <div className="row down-row">
                         {cardOne && (
-                            <div className={`card_Game selectable ${cardOne.type}`}>
-                                <p className='mana'>{cardOne.mana_cost}</p>
-                                <p className='atk'>{cardOne.atk_points}</p>
-                                <p className='name'>{cardOne.name} </p>
-                            </div>
+                        <div 
+                            className={`card_Game selectable ${cardOne.type}`} 
+                            onClick={async () => {
+                                try {
+                                    const playDuckResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${userPlayer.id}/play_duck/1`, { method: 'PATCH' });
+                                    if (!playDuckResponse.ok) {
+                                        throw new Error('Error playing card one');
+                                    }
+                                    const saveCardUrl = userPlayer.id === game.playerOne 
+                                        ? `${import.meta.env.VITE_BACKEND_URL}/games/save_card1/${gameId}` 
+                                        : `${import.meta.env.VITE_BACKEND_URL}/games/save_card2/${gameId}`;
+                                    await fetch(saveCardUrl, {
+                                        method: 'PATCH',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                        },
+                                        body: JSON.stringify({ cardId: cardOne.id }),
+                                    });
+                                } catch (error) {
+                                    console.error('Error playing card one:', error);
+                                }
+                            }}
+                        >
+                            <p className='mana'>{cardOne.mana_cost}</p>
+                            <p className='atk'>{cardOne.atk_points}</p>
+                            <p className='name'>{cardOne.name}</p>
+                        </div>
                         )}
                         {!cardOne && <div className="card_Game"></div>}
                         {cardTwo && (
-                            <div className={`card_Game selectable ${cardTwo.type}`}>
-                                <p className='mana'>{cardTwo.mana_cost}</p>
-                                <p className='atk'>{cardTwo.atk_points}</p>
-                                <p className='name'>{cardTwo.name} </p>
-                                
-                            </div>
+                        <div 
+                            className={`card_Game selectable ${cardTwo.type}`} 
+                            onClick={async () => {
+                                try {
+                                    const playDuckResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${userPlayer.id}/play_duck/2`, { method: 'PATCH' });
+                                    if (!playDuckResponse.ok) {
+                                        throw new Error('Error playing card two');
+                                    }
+                                    const saveCardUrl = userPlayer.id === game.playerOne 
+                                        ? `${import.meta.env.VITE_BACKEND_URL}/games/save_card1/${gameId}` 
+                                        : `${import.meta.env.VITE_BACKEND_URL}/games/save_card2/${gameId}`;
+                                    await fetch(saveCardUrl, {
+                                        method: 'PATCH',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                        },
+                                        body: JSON.stringify({ cardId: cardTwo.id }),
+                                    });
+                                } catch (error) {
+                                    console.error('Error playing card two:', error);
+                                }
+                            }}
+                        >
+                            <p className='mana'>{cardTwo.mana_cost}</p>
+                            <p className='atk'>{cardTwo.atk_points}</p>
+                            <p className='name'>{cardTwo.name}</p>
+                        </div>
                         )}
                         {!cardTwo && <div className="card_Game"></div>}
                         {cardThree && (
-                            <div className={`card_Game selectable ${cardThree.type}`}>
-                                <p className='mana'>{cardThree.mana_cost}</p>
-                                <p className='atk'>{cardThree.atk_points}</p>
-                                <p className='name'>{cardThree.name} </p>
-                            </div>
+                        <div 
+                            className={`card_Game selectable ${cardThree.type}`} 
+                            onClick={async () => {
+                                try {
+                                    const playDuckResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${userPlayer.id}/play_duck/3`, { method: 'PATCH' });
+                                    if (!playDuckResponse.ok) {
+                                        throw new Error('Error playing card three');
+                                    }
+                                    const saveCardUrl = userPlayer.id === game.playerOne 
+                                        ? `${import.meta.env.VITE_BACKEND_URL}/games/save_card1/${gameId}` 
+                                        : `${import.meta.env.VITE_BACKEND_URL}/games/save_card2/${gameId}`;
+                                    await fetch(saveCardUrl, {
+                                        method: 'PATCH',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                        },
+                                        body: JSON.stringify({ cardId: cardThree.id }),
+                                    });
+                                } catch (error) {
+                                    console.error('Error playing card three:', error);
+                                }
+                            }}
+                        >
+                            <p className='mana'>{cardThree.mana_cost}</p>
+                            <p className='atk'>{cardThree.atk_points}</p>
+                            <p className='name'>{cardThree.name}</p>
+                        </div>
                         )}
                         {!cardThree && <div className="card_Game"></div>}
                         {cardFour && (
-                            <div className={`card_Game selectable ${cardFour.type}`}>
-                                <p className='mana'>{cardFour.mana_cost}</p>
-                                <p className='atk'>{cardFour.atk_points}</p>
-                                <p className='name'>{cardFour.name} </p>
-                            </div>
+                        <div 
+                            className={`card_Game selectable ${cardFour.type}`} 
+                            onClick={async () => {
+                                try {
+                                    const playDuckResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${userPlayer.id}/play_duck/4`, { method: 'PATCH' });
+                                    if (!playDuckResponse.ok) {
+                                        throw new Error('Error playing card four');
+                                    }
+                                    const saveCardUrl = userPlayer.id === game.playerOne 
+                                        ? `${import.meta.env.VITE_BACKEND_URL}/games/save_card1/${gameId}` 
+                                        : `${import.meta.env.VITE_BACKEND_URL}/games/save_card2/${gameId}`;
+                                    await fetch(saveCardUrl, {
+                                        method: 'PATCH',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                        },
+                                        body: JSON.stringify({ cardId: cardFour.id }),
+                                    });
+                                } catch (error) {
+                                    console.error('Error playing card four:', error);
+                                }
+                            }}
+                        >
+                            <p className='mana'>{cardFour.mana_cost}</p>
+                            <p className='atk'>{cardFour.atk_points}</p>
+                            <p className='name'>{cardFour.name}</p>
+                        </div>
                         )}
                         {!cardFour && <div className="card_Game"></div>}
                         {cardFive && (
-                            <div className={`card_Game selectable ${cardFive.type}`}>
-                                <p className='mana'>{cardFive.mana_cost}</p>
-                                <p className='atk'>{cardFive.atk_points}</p>
-                                <p className='name'>{cardFive.name}</p>
-                            </div>
+                        <div 
+                            className={`card_Game selectable ${cardFive.type}`} 
+                            onClick={async () => {
+                                try {
+                                    const playDuckResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${userPlayer.id}/play_duck/5`, { method: 'PATCH' });
+                                    if (!playDuckResponse.ok) {
+                                        throw new Error('Error playing card five');
+                                    }
+                                    const saveCardUrl = userPlayer.id === game.playerOne 
+                                        ? `${import.meta.env.VITE_BACKEND_URL}/games/save_card1/${gameId}` 
+                                        : `${import.meta.env.VITE_BACKEND_URL}/games/save_card2/${gameId}`;
+                                    await fetch(saveCardUrl, {
+                                        method: 'PATCH',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                        },
+                                        body: JSON.stringify({ cardId: cardFive.id }),
+                                    });
+                                } catch (error) {
+                                    console.error('Error playing card five:', error);
+                                }
+                            }}
+                        >
+                            <p className='mana'>{cardFive.mana_cost}</p>
+                            <p className='atk'>{cardFive.atk_points}</p>
+                            <p className='name'>{cardFive.name}</p>
+                        </div>
                         )}
                         {!cardFive && <div className="card_Game"></div>}
                     </div>
@@ -248,28 +404,28 @@ function GameBoard() {
                         <div className="health-fill" style={{ height: `${userPlayer?.health_points / 50 * 100}%` }}></div>
                     </div>
                     <div className="mana-bar">
-                        <div className="mana-fill" style={{ height: `${otherPlayer?.actual_mana / 9 * 100}%` }}></div>
+                        <div className="mana-fill" style={{ height: `${userPlayer?.actual_mana / 9 * 100}%` }}></div>
                     </div>
                 </div>
-            </div>    
-            <br/>
-            <div className="player-count">
-                <p>Players: {game?.player_count}/2</p>
-            </div>
-            {userPlayer?.id === game?.playerOne && game?.started === false && (
-            <button onClick={async () => {
-                try {
-                    await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${userPlayer.id}/refill_hand`, { method: 'PATCH' });
-                    await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${otherPlayer.id}/refill_hand`, { method: 'PATCH' });
-                    await fetch(`${import.meta.env.VITE_BACKEND_URL}/games/start/${gameId}`, { method: 'PATCH' });
-                    console.log('Hand refilled for both players');
-                } catch (error) {
-                    console.error('Error refilling hand:', error);
-                }
-            }} disabled={game?.player_count !== 2}>Comenzar Partida</button>
-            )}
-        </>
-    );
+                </div>    
+                <br/>
+                <div className="player-count">
+                    <p>Players: {game?.player_count}/2</p>
+                </div>
+                {userPlayer?.id === game?.playerOne && game?.started === false && (
+                <button onClick={async () => {
+                    try {
+                        await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${userPlayer.id}/refill_hand`, { method: 'PATCH' });
+                        await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${otherPlayer.id}/refill_hand`, { method: 'PATCH' });
+                        await fetch(`${import.meta.env.VITE_BACKEND_URL}/games/start/${gameId}`, { method: 'PATCH' });
+                        console.log('Hand refilled for both players');
+                    } catch (error) {
+                        console.error('Error refilling hand:', error);
+                    }
+                }} disabled={game?.player_count !== 2}>Comenzar Partida</button>
+                )}
+            </>
+        );
     }
 
 export default GameBoard;
