@@ -21,6 +21,7 @@ function GameBoard() {
     const [cardFive, setCardFive] = React.useState(null);
     const [cardOneGame, setCardOneGame] = React.useState(null);
     const [cardTwoGame, setCardTwoGame] = React.useState(null);
+    const [cardsUpdated, setCardsUpdated] = React.useState(false);
     const socket = useRef(null);
     const config = {
         method: 'get',
@@ -180,6 +181,23 @@ function GameBoard() {
         fetchPlayerCards();
     }, [userPlayer, game]);
 
+    async function updatePlayedCards() {
+        try {
+            await new Promise(resolve => setTimeout(resolve, 3000));
+            await fetch(`${import.meta.env.VITE_BACKEND_URL}/games/updateplayedcards/${gameId}`, { method: 'PATCH' });
+            console.log('Played cards updated');
+        } catch (error) {
+            console.error('Error updating played cards:', error);
+        }
+    }
+
+    useEffect(() => {
+        if (cardOneGame && cardTwoGame && !cardsUpdated) {
+            updatePlayedCards();
+            setCardsUpdated(true);
+        }
+    }, [cardOneGame, cardTwoGame]);
+
     return (
         <>
             <br></br>
@@ -207,7 +225,9 @@ function GameBoard() {
                                 {game?.card_2 ? (
                                     <div className={`card_Game ${cardTwoGame?.type}`}>
                                         <p className='mana'>{cardTwoGame?.mana_cost}</p>
-                                        <p className='atk'>{cardTwoGame?.atk_points}</p>
+                                        <p className={game?.new_damage_card_2 > cardTwoGame?.atk_points ? 'atk_blue' : 'atk'}>
+                                            {game?.new_damage_card_2 ?? cardTwoGame?.atk_points}
+                                        </p>
                                         <p className='name'>{cardTwoGame?.name}</p>
                                     </div>
                                 ) : (
@@ -216,7 +236,9 @@ function GameBoard() {
                                 {game?.card_1 ? (
                                     <div className={`card_Game ${cardOneGame?.type}`}>
                                         <p className='mana'>{cardOneGame?.mana_cost}</p>
-                                        <p className='atk'>{cardOneGame?.atk_points}</p>
+                                        <p className={game?.new_damage_card_1 > cardOneGame?.atk_points ? 'atk_blue' : 'atk'}>
+                                            {game?.new_damage_card_1 ?? cardOneGame?.atk_points}
+                                        </p>
                                         <p className='name'>{cardOneGame?.name}</p>
                                     </div>
                                 ) : (
@@ -228,7 +250,9 @@ function GameBoard() {
                                 {game?.card_1 ? (
                                     <div className={`card_Game ${cardOneGame?.type}`}>
                                         <p className='mana'>{cardOneGame?.mana_cost}</p>
-                                        <p className='atk'>{cardOneGame?.atk_points}</p>
+                                        <p className={game?.new_damage_card_1 > cardOneGame?.atk_points ? 'atk_blue' : 'atk'}>
+                                            {game?.new_damage_card_1 ?? cardOneGame?.atk_points}
+                                        </p>
                                         <p className='name'>{cardOneGame?.name}</p>
                                     </div>
                                 ) : (
@@ -237,7 +261,9 @@ function GameBoard() {
                                 {game?.card_2 ? (
                                     <div className={`card_Game ${cardTwoGame?.type}`}>
                                         <p className='mana'>{cardTwoGame?.mana_cost}</p>
-                                        <p className='atk'>{cardTwoGame?.atk_points}</p>
+                                        <p className={game?.new_damage_card_2 > cardTwoGame?.atk_points ? 'atk_blue' : 'atk'}>
+                                            {game?.new_damage_card_2 ?? cardTwoGame?.atk_points}
+                                        </p>
                                         <p className='name'>{cardTwoGame?.name}</p>
                                     </div>
                                 ) : (
