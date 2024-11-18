@@ -390,6 +390,14 @@ details summary:hover {
   position: relative;
 }
 
+.atk_blue{
+  color: #00f7ff;
+  bottom: 33%;
+  left: 70%;
+  margin-top: 0;
+  position: relative;
+}
+
 .name{
   font-size: 11px;
   text-align: center;

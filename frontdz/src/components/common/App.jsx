@@ -1,6 +1,4 @@
 import { useState } from 'react'
-import reactLogo from '../../assets/react.svg'
-import viteLogo from '/vite.svg'
 import pato1 from '../../assets/imgs/pato1.png'
 import pato2 from '../../assets/imgs/pato2.png'
 import "slick-carousel/slick/slick.css"; 
