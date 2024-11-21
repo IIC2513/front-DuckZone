@@ -3,6 +3,8 @@ import { useParams } from 'react-router-dom';
 import { AuthContext } from '../auth/AuthContext';
 import axios from 'axios';
 import io from "socket.io-client";
+import ReactDOM from "react-dom/client";
+
 
 function GameBoard() {
 
@@ -30,7 +32,7 @@ function GameBoard() {
           'Authorization': `Bearer ${token}`,
         }
     };
-    
+
     useEffect(() => {
         const connectSocket = () => {
             socket.current = io(import.meta.env.VITE_BACKEND_URL, {
@@ -41,7 +43,7 @@ function GameBoard() {
 
             socket.current.on("connect_error", (error) => {
                 console.error("WebSocket connection error:", error);
-                addToast("Error de conexión WebSocket", "error");
+                // addToast("Error de conexión WebSocket", "error");
             });
 
             socket.current.on("game_updated", handleGameUpdated);
@@ -66,7 +68,6 @@ function GameBoard() {
         const handleGameUpdated = (updatedGame) => {
             if (updatedGame.id === gameId) {
                 setGame(updatedGame);
-                console.log('Game updated:', updatedGame);
             }
         };
 
@@ -84,10 +85,9 @@ function GameBoard() {
             if (socket.current) {
                 socket.current.off("game_updated", handleGameUpdated);
                 socket.current.off("player_updated", handlePlayerUpdated);
-                // No desconectamos el socket aquí
             }
         };
-    }, [gameId, userPlayer, otherPlayer]); // Dependencies to re-run the effect if these change
+    }, [gameId, userPlayer, otherPlayer]);
     
     useEffect(() => {
           axios(config)
@@ -101,44 +101,81 @@ function GameBoard() {
                   setMsg("not logged");
               });
       }, []);
-
+             
     useEffect(() => {
-        async function fetchGame() {
-            try {
-                const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/games/${gameId}`);
-                const data = await response.json();
-                setGame(data);
-            } catch (error) {
-                console.error('Error fetching game data:', error);
-            }
-        }
-
         fetchGame();
     }, [gameId]);
 
     useEffect(() => {
-        async function fetchPlayers() {
-            if (game) {
-                try {
-                    const playerOneResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${game.playerOne}`);
-                    const playerOneData = await playerOneResponse.json();
-                    const playerTwoResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${game.playerTwo}`);
-                    const playerTwoData = await playerTwoResponse.json();
-                    if (playerOneData.userId == userId) {
-                        setUserPlayer(playerOneData);
-                        setOtherPlayer(playerTwoData);
-                    } else if (playerTwoData.userId == userId) {
-                        setUserPlayer(playerTwoData);
-                        setOtherPlayer(playerOneData);
+        if (game) {
+        fetchPlayers();
+        }
+    }, [game]);
+
+    useEffect(() => {
+        if (game) {
+        fetchPlayerCards();
+        }
+    }, [userPlayer, game]);
+
+    useEffect(() => {
+        if (game?.card_1 && game?.card_2 && game.updated_cards === false) {
+            game.updated_cards = true;
+            new Promise((resolve) => {
+                setTimeout(() => {
+                    updatePlayedCards().then(() => {
+                        new Promise((resolve1) => {
+                            if (userPlayer.id === game.playerOne) {
+                            setTimeout(() => {
+                                console.log('Resolving turn...');
+                                resolveTurn();
+                                resolve1();
+                            }, 3000);
+                        } else {
+                            setTimeout(() => {
+                                console.log('Waiting for other player to resolve turn...');
+                                resolve1();
+                        }, 3000);
                     }
-                } catch (error) {
-                    console.error('Error fetching players data:', error);
+                        });
+                    }).then(() => {
+                        fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${userPlayer.id}/refill_hand`, { method: 'PATCH' });
+                    });
+                    resolve();
+                }, 3000);
+            });
+        }
+    }, [game, cardsUpdated]);
+
+      async function fetchGame() {
+        try {
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/games/${gameId}`);
+            const data = await response.json();
+            setGame(data);
+        } catch (error) {
+            console.error('Error fetching game data:', error);
+        }
+    }
+
+    async function fetchPlayers() {
+        if (game) {
+            try {
+                const playerOneResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${game.playerOne}`);
+                const playerOneData = await playerOneResponse.json();
+                const playerTwoResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${game.playerTwo}`);
+                const playerTwoData = await playerTwoResponse.json();
+                if (playerOneData.userId == userId) {
+                    setUserPlayer(playerOneData);
+                    setOtherPlayer(playerTwoData);
+                } else if (playerTwoData.userId == userId) {
+                    setUserPlayer(playerTwoData);
+                    setOtherPlayer(playerOneData);
                 }
+            } catch (error) {
+                console.error('Error fetching players data:', error);
             }
         }
-
-        fetchPlayers();
-    }, [game, userId]);
+    }
 
     async function fetchCard(cardId) {
         try {
@@ -151,52 +188,80 @@ function GameBoard() {
         }
     }
 
-    useEffect(() => {
-        async function fetchPlayerCards() {
-            if (userPlayer) {
-                const cardIds = [
-                    userPlayer.cardOneId,
-                    userPlayer.cardTwoId,
-                    userPlayer.cardThreeId,
-                    userPlayer.cardFourId,
-                    userPlayer.cardFiveId,
-                    game.card_1,
-                    game.card_2,
-                ];
+    async function fetchPlayerCards() {
+        if (userPlayer) {
+            const cardIds = [
+                userPlayer.cardOneId,
+                userPlayer.cardTwoId,
+                userPlayer.cardThreeId,
+                userPlayer.cardFourId,
+                userPlayer.cardFiveId,
+                game.card_1,
+                game.card_2,
+            ];
 
-                const cardPromises = cardIds.map(cardId => cardId ? fetchCard(cardId).catch(() => null) : Promise.resolve(null));
-                const cards = await Promise.all(cardPromises);
+            const cardPromises = cardIds.map(cardId => cardId ? fetchCard(cardId).catch(() => null) : Promise.resolve(null));
+            const cards = await Promise.all(cardPromises);
 
-                setCardOne(cards[0]);
-                setCardTwo(cards[1]);
-                setCardThree(cards[2]);
-                setCardFour(cards[3]);
-                setCardFive(cards[4]);
-                setCardOneGame(cards[5]);
-                setCardTwoGame(cards[6]);
-                console.log('Player cards:', cardIds);
-            }
+            setCardOne(cards[0]);
+            setCardTwo(cards[1]);
+            setCardThree(cards[2]);
+            setCardFour(cards[3]);
+            setCardFive(cards[4]);
+            setCardOneGame(cards[5]);
+            setCardTwoGame(cards[6]);
         }
-
-        fetchPlayerCards();
-    }, [userPlayer, game]);
+    }
 
     async function updatePlayedCards() {
         try {
-            await new Promise(resolve => setTimeout(resolve, 3000));
-            await fetch(`${import.meta.env.VITE_BACKEND_URL}/games/updateplayedcards/${gameId}`, { method: 'PATCH' });
-            console.log('Played cards updated');
+
+                await fetch(`${import.meta.env.VITE_BACKEND_URL}/games/updateplayedcards/${gameId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ playerId: userPlayer.id }),
+            });
         } catch (error) {
             console.error('Error updating played cards:', error);
         }
     }
 
-    useEffect(() => {
-        if (cardOneGame && cardTwoGame && !cardsUpdated) {
-            updatePlayedCards();
-            setCardsUpdated(true);
+    async function resolveTurn() {
+        try {
+            await fetch(`${import.meta.env.VITE_BACKEND_URL}/games/resolve/${gameId}`, { 
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ playerId: userPlayer.id }),
+            });
+        } catch (error) {
+            console.error('Error resolving turn:', error);
         }
-    }, [cardOneGame, cardTwoGame]);
+    }
+
+    const handleCardClick = async (card, cardIndex) => {
+        try {
+            const playDuckResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${userPlayer.id}/play_duck/${cardIndex}`, { method: 'PATCH' });
+            if (!playDuckResponse.ok) {
+                throw new Error(`Error playing card ${cardIndex}`);
+            }
+            const saveCardUrl = userPlayer.id === game.playerOne 
+                ? `${import.meta.env.VITE_BACKEND_URL}/games/save_card1/${gameId}` 
+                : `${import.meta.env.VITE_BACKEND_URL}/games/save_card2/${gameId}`;
+            await fetch(saveCardUrl, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ cardId: card.id }),
+            });
+        } catch (error) {
+            console.error(`Error playing card ${cardIndex}:`, error);
+        }
+    };
 
     return (
         <>
@@ -222,7 +287,7 @@ function GameBoard() {
                     <div className="row middle-row">
                         {userPlayer?.id === game?.playerOne ? (
                             <>
-                                {game?.card_2 ? (
+                                {game?.card_1 && game?.card_2 ? (
                                     <div className={`card_Game ${cardTwoGame?.type}`}>
                                         <p className='mana'>{cardTwoGame?.mana_cost}</p>
                                         <p className={game?.new_damage_card_2 > cardTwoGame?.atk_points ? 'atk_blue' : 'atk'}>
@@ -230,10 +295,12 @@ function GameBoard() {
                                         </p>
                                         <p className='name'>{cardTwoGame?.name}</p>
                                     </div>
+                                ) : game?.card_2 ? (
+                                    <div className="card_Game"></div>
                                 ) : (
                                     <div className="card_Game select"></div>
                                 )}
-                                {game?.card_1 ? (
+                                 {game?.card_1 ? (
                                     <div className={`card_Game ${cardOneGame?.type}`}>
                                         <p className='mana'>{cardOneGame?.mana_cost}</p>
                                         <p className={game?.new_damage_card_1 > cardOneGame?.atk_points ? 'atk_blue' : 'atk'}>
@@ -247,7 +314,7 @@ function GameBoard() {
                             </>
                         ) : (
                             <>
-                                {game?.card_1 ? (
+                                {game?.card_1 && game?.card_2 ? (
                                     <div className={`card_Game ${cardOneGame?.type}`}>
                                         <p className='mana'>{cardOneGame?.mana_cost}</p>
                                         <p className={game?.new_damage_card_1 > cardOneGame?.atk_points ? 'atk_blue' : 'atk'}>
@@ -255,6 +322,8 @@ function GameBoard() {
                                         </p>
                                         <p className='name'>{cardOneGame?.name}</p>
                                     </div>
+                                ) : game?.card_1 ? (
+                                    <div className="card_Game"></div>
                                 ) : (
                                     <div className="card_Game select"></div>
                                 )}
@@ -276,26 +345,7 @@ function GameBoard() {
                         {cardOne && (
                         <div 
                             className={`card_Game selectable ${cardOne.type}`} 
-                            onClick={async () => {
-                                try {
-                                    const playDuckResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${userPlayer.id}/play_duck/1`, { method: 'PATCH' });
-                                    if (!playDuckResponse.ok) {
-                                        throw new Error('Error playing card one');
-                                    }
-                                    const saveCardUrl = userPlayer.id === game.playerOne 
-                                        ? `${import.meta.env.VITE_BACKEND_URL}/games/save_card1/${gameId}` 
-                                        : `${import.meta.env.VITE_BACKEND_URL}/games/save_card2/${gameId}`;
-                                    await fetch(saveCardUrl, {
-                                        method: 'PATCH',
-                                        headers: {
-                                            'Content-Type': 'application/json',
-                                        },
-                                        body: JSON.stringify({ cardId: cardOne.id }),
-                                    });
-                                } catch (error) {
-                                    console.error('Error playing card one:', error);
-                                }
-                            }}
+                            onClick={() => handleCardClick(cardOne, 1)}
                         >
                             <p className='mana'>{cardOne.mana_cost}</p>
                             <p className='atk'>{cardOne.atk_points}</p>
@@ -306,26 +356,7 @@ function GameBoard() {
                         {cardTwo && (
                         <div 
                             className={`card_Game selectable ${cardTwo.type}`} 
-                            onClick={async () => {
-                                try {
-                                    const playDuckResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${userPlayer.id}/play_duck/2`, { method: 'PATCH' });
-                                    if (!playDuckResponse.ok) {
-                                        throw new Error('Error playing card two');
-                                    }
-                                    const saveCardUrl = userPlayer.id === game.playerOne 
-                                        ? `${import.meta.env.VITE_BACKEND_URL}/games/save_card1/${gameId}` 
-                                        : `${import.meta.env.VITE_BACKEND_URL}/games/save_card2/${gameId}`;
-                                    await fetch(saveCardUrl, {
-                                        method: 'PATCH',
-                                        headers: {
-                                            'Content-Type': 'application/json',
-                                        },
-                                        body: JSON.stringify({ cardId: cardTwo.id }),
-                                    });
-                                } catch (error) {
-                                    console.error('Error playing card two:', error);
-                                }
-                            }}
+                            onClick={() => handleCardClick(cardTwo, 2)}
                         >
                             <p className='mana'>{cardTwo.mana_cost}</p>
                             <p className='atk'>{cardTwo.atk_points}</p>
@@ -336,26 +367,7 @@ function GameBoard() {
                         {cardThree && (
                         <div 
                             className={`card_Game selectable ${cardThree.type}`} 
-                            onClick={async () => {
-                                try {
-                                    const playDuckResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${userPlayer.id}/play_duck/3`, { method: 'PATCH' });
-                                    if (!playDuckResponse.ok) {
-                                        throw new Error('Error playing card three');
-                                    }
-                                    const saveCardUrl = userPlayer.id === game.playerOne 
-                                        ? `${import.meta.env.VITE_BACKEND_URL}/games/save_card1/${gameId}` 
-                                        : `${import.meta.env.VITE_BACKEND_URL}/games/save_card2/${gameId}`;
-                                    await fetch(saveCardUrl, {
-                                        method: 'PATCH',
-                                        headers: {
-                                            'Content-Type': 'application/json',
-                                        },
-                                        body: JSON.stringify({ cardId: cardThree.id }),
-                                    });
-                                } catch (error) {
-                                    console.error('Error playing card three:', error);
-                                }
-                            }}
+                            onClick={() => handleCardClick(cardThree, 3)}
                         >
                             <p className='mana'>{cardThree.mana_cost}</p>
                             <p className='atk'>{cardThree.atk_points}</p>
@@ -366,26 +378,7 @@ function GameBoard() {
                         {cardFour && (
                         <div 
                             className={`card_Game selectable ${cardFour.type}`} 
-                            onClick={async () => {
-                                try {
-                                    const playDuckResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${userPlayer.id}/play_duck/4`, { method: 'PATCH' });
-                                    if (!playDuckResponse.ok) {
-                                        throw new Error('Error playing card four');
-                                    }
-                                    const saveCardUrl = userPlayer.id === game.playerOne 
-                                        ? `${import.meta.env.VITE_BACKEND_URL}/games/save_card1/${gameId}` 
-                                        : `${import.meta.env.VITE_BACKEND_URL}/games/save_card2/${gameId}`;
-                                    await fetch(saveCardUrl, {
-                                        method: 'PATCH',
-                                        headers: {
-                                            'Content-Type': 'application/json',
-                                        },
-                                        body: JSON.stringify({ cardId: cardFour.id }),
-                                    });
-                                } catch (error) {
-                                    console.error('Error playing card four:', error);
-                                }
-                            }}
+                            onClick={() => handleCardClick(cardFour, 4)}
                         >
                             <p className='mana'>{cardFour.mana_cost}</p>
                             <p className='atk'>{cardFour.atk_points}</p>
@@ -396,26 +389,7 @@ function GameBoard() {
                         {cardFive && (
                         <div 
                             className={`card_Game selectable ${cardFive.type}`} 
-                            onClick={async () => {
-                                try {
-                                    const playDuckResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${userPlayer.id}/play_duck/5`, { method: 'PATCH' });
-                                    if (!playDuckResponse.ok) {
-                                        throw new Error('Error playing card five');
-                                    }
-                                    const saveCardUrl = userPlayer.id === game.playerOne 
-                                        ? `${import.meta.env.VITE_BACKEND_URL}/games/save_card1/${gameId}` 
-                                        : `${import.meta.env.VITE_BACKEND_URL}/games/save_card2/${gameId}`;
-                                    await fetch(saveCardUrl, {
-                                        method: 'PATCH',
-                                        headers: {
-                                            'Content-Type': 'application/json',
-                                        },
-                                        body: JSON.stringify({ cardId: cardFive.id }),
-                                    });
-                                } catch (error) {
-                                    console.error('Error playing card five:', error);
-                                }
-                            }}
+                            onClick={() => handleCardClick(cardFive, 5)}
                         >
                             <p className='mana'>{cardFive.mana_cost}</p>
                             <p className='atk'>{cardFive.atk_points}</p>
@@ -444,7 +418,6 @@ function GameBoard() {
                         await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${userPlayer.id}/refill_hand`, { method: 'PATCH' });
                         await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${otherPlayer.id}/refill_hand`, { method: 'PATCH' });
                         await fetch(`${import.meta.env.VITE_BACKEND_URL}/games/start/${gameId}`, { method: 'PATCH' });
-                        console.log('Hand refilled for both players');
                     } catch (error) {
                         console.error('Error refilling hand:', error);
                     }
