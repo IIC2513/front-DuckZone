@@ -65,7 +65,6 @@ const NewPublic = () => {
             });
             setSuccess('Sala creada existosamente!');
             console.log('Room created:', response.data);
-            await new Promise(resolve => setTimeout(resolve, 1500));
             navigate(`../games/${response.data.game.id}`);
         } catch (err) {
             setError('Ha ocurrido un error al crear la sala.');
