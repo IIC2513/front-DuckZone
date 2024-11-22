@@ -29,7 +29,7 @@ function AdminFooter() {
                 {isAdmin && (
                     <div className='footer'>
                     <p className='el-foot'>¡Hola, Admin!</p>
-                    <a className='el-foot' href='/adm/reports'>Usuarios</a>
+                    <a className='el-foot' href='/adm/users'>Usuarios</a>
                     <a className='el-foot' href='/adm/reports'>Reportes</a>
                     </div>
                 )}
