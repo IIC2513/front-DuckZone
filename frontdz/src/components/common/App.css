@@ -9,6 +9,28 @@
   text-align: center;
 }
 
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+}
+
+.headertab {
+  font-weight: bold;
+  background-color: #f0f0f0;
+}
+
+.elemento {
+  padding: 10px;
+  border-left: 1px solid #ccc;
+  border-right: 1px solid #ccc;
+  max-width: 200px; /* Ajusta el ancho máximo según tus necesidades */
+  word-wrap: break-word; /* Permite que las palabras largas se ajusten */
+  word-break: break-all;
+}
+
 .container {
   width: 100%;
   display: flex;
