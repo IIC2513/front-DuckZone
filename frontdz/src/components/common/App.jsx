@@ -47,6 +47,12 @@ function App() {
           </div>
         </Slider>
       </div>
+      <br></br>
+      <br></br>
+      <br></br>
+      <br></br>
+      <br></br>
+      <br></br>
     </>
   )
 }

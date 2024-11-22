@@ -17,6 +17,7 @@ import UserCheck from '../protected/UserCheck';
 import AdminCheck from '../protected/AdminCheck';
 import GameBoard from '../game/GameBoard';
 import Reports from '../admin/ReportList';
+import AdminFooter from '../admin/Footer';
 function Routing() {
     return(
         <>
@@ -42,6 +43,7 @@ function Routing() {
                 <Route path="/games/:id" element={<GameBoard />} /> 
                 <Route path="*" element={<h1>404 Not Found</h1>} />
             </Routes>
+            <AdminFooter />
         </BrowserRouter>
         </>
     )
