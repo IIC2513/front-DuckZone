@@ -77,6 +77,9 @@ function Ranking(){
             {loading ? "Cargando..." : "Cargar Más"}
         </button>
         </div>
+        <br></br>
+        <br></br>
+        <br></br>
         </>
     )
 }
