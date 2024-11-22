@@ -16,6 +16,7 @@ import About from './about';
 import UserCheck from '../protected/UserCheck';
 import AdminCheck from '../protected/AdminCheck';
 import GameBoard from '../game/GameBoard';
+import Reports from '../admin/ReportList';
 function Routing() {
     return(
         <>
@@ -36,6 +37,7 @@ function Routing() {
                 <Route path="/newpublic" element={<NewPublic />} />
                 <Route path="/newprivate" element={<NewPrivate />} />
                 <Route path="/usercheck" element={<UserCheck />} />
+                <Route path="/adm/reports" element={<Reports />} />
                 <Route path="/admincheck" element={<AdminCheck />} />
                 <Route path="/games/:id" element={<GameBoard />} /> 
                 <Route path="*" element={<h1>404 Not Found</h1>} />
