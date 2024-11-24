@@ -44,6 +44,7 @@
   padding: 10px;
   border-left: 1px solid #ccc;
   border-right: 1px solid #ccc;
+  align-content: center;
   max-width: 200px; /* Ajusta el ancho máximo según tus necesidades */
   word-wrap: break-word; /* Permite que las palabras largas se ajusten */
   word-break: break-all;
@@ -293,6 +294,11 @@ details summary:hover {
   float: none;
   margin: 0 auto !important; /* Sobrescribe el margen */
   width: 1000px;
+}
+
+.chiquito{
+  height: 30px;
+  width: auto;
 }
 
 .profile-pfp {

@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import checkBoxImg from '../../assets/imgs/check_box.png';
+import personCancelImg from '../../assets/imgs/person_cancel.png';
+
 
 function Users() {
     const [isAdmin, setIsAdmin] = useState(false);
@@ -34,12 +37,29 @@ function Users() {
             }
         };
 
+        
         fetchData();
     }, []);
+    
+    const handleImageClick = async (userId, motive) => {
+        try {
+            const token = localStorage.getItem('token');
+            
+            const response = await axios.patch(`${import.meta.env.VITE_BACKEND_URL}/users/${userId}/${motive}`, {}, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            console.log('Response:', response.data);
+            window.location.reload();
+        } catch (error) {
+            console.error('Error toggling user status:', error);
+        }
+    };
 
     return (
         <>
-            <h1>Reportes</h1>
+            <h1>Usuarios</h1>
             {isAdmin ? (
                 <p>Bienvenido, Admin!</p>
             ) : (
@@ -57,8 +77,14 @@ function Users() {
                         <div key={index} className='grid'>
                             <p className='elemento'>{coso.username}</p>
                             <p className='elemento'>{coso.count}</p>
-                            <p className='elemento'>estado</p>
-                            <p className='elemento'>estado</p>
+                            <p className='elemento'>{coso.status}</p>
+                            <a className='elemento'>
+                                {coso.status !== 'Activa' ? (
+                                    <img src={checkBoxImg} alt="Check Box" className='chiquito' onClick={() => handleImageClick(coso.id, 'unban')}/>
+                                ) : (
+                                    <img src={personCancelImg} alt="Person Cancel" className='chiquito' onClick={() => handleImageClick(coso.id, 'ban')}/>
+                                )}
+                            </a>
                             </div>
                     ))}
                 </div>
