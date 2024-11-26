@@ -24,7 +24,7 @@ function GameBoard() {
     const [cardOneGame, setCardOneGame] = React.useState(null);
     const [cardTwoGame, setCardTwoGame] = React.useState(null);
     const [cardsBlocked, setCardsBlocked] = React.useState(false);
-    const [played, setPlayed] = React.useState(null);
+    const [played, setPlayed] = React.useState(false);
     const socket = useRef(null);
     const config = {
         method: 'get',
@@ -49,6 +49,7 @@ function GameBoard() {
 
             socket.current.on("game_updated", handleGameUpdated);
             socket.current.on("player_updated", handlePlayerUpdated);
+            socket.current.on("disconnect", handleDisconnect);
 
             socket.current.on("disconnect", () => {
                 console.warn("WebSocket disconnected. Attempting to reconnect...");
@@ -65,6 +66,30 @@ function GameBoard() {
                 }
             });
         };  
+
+        const handleUnload = (event) => {
+            handleDisconnect();
+          };
+
+        window.addEventListener('beforeunload', handleUnload);
+        window.addEventListener('unload', handleUnload);
+
+        const handleDisconnect = async () => {
+            console.log("User disconnected");
+            if (userPlayer) {
+              try {
+                await fetch(`${import.meta.env.VITE_BACKEND_URL}/games/winbywalkover/${gameId}`, {
+                  method: 'PATCH',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({ playerId: userPlayer.id }),
+                });
+              } catch (error) {
+                console.error('Error handling disconnect:', error);
+              }
+            }
+          };
 
         const handleGameUpdated = (updatedGame) => {
             if (updatedGame.id === gameId) {
@@ -84,26 +109,16 @@ function GameBoard() {
 
         return () => {
             if (socket.current) {
+                socket.current.off("disconnect", handleDisconnect);
                 socket.current.off("game_updated", handleGameUpdated);
                 socket.current.off("player_updated", handlePlayerUpdated);
             }
         };
     }, [gameId, userPlayer, otherPlayer]);
-
-    useEffect(() => {
-        const handleUserDisconnected = (disconnectedUserId) => {
-            console.log(`User with ID ${disconnectedUserId} has disconnected.`);
-        };
-
-        socket.current.on("user_disconnected", handleUserDisconnected);
-
-        return () => {
-            if (socket.current) {
-                socket.current.off("user_disconnected", handleUserDisconnected);
-            }
-        };
-    }, []);
     
+   
+
+
     useEffect(() => {
           axios(config)
               .then((response) => {
@@ -251,6 +266,12 @@ function GameBoard() {
             fetchPlayerCards();
         }
     }, [game?.started]);
+
+    useEffect(() => {
+        if (game?.finished) {
+            fetchGame();
+        }
+    }, [game?.finished]);
 
     async function updatePlayedCards() {
         try {
