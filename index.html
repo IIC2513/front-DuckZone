@@ -1,13 +1,22 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" href="/src/assets/imgs/Patito_Icono.png" />
+    <link rel="icon" type="image/png" href="/src/assets/imgs/Patito_Icono.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>DuckZone</title>
+    <!-- if development -->
+    <script type="module" src="http://localhost:5173/@vite/client"></script>
+    <script type="module">
+        import RefreshRuntime from 'http://localhost:5173/@react-refresh'
+        RefreshRuntime.injectIntoGlobalHook(window)
+        window.$RefreshReg$ = () => {}
+        window.$RefreshSig$ = () => (type) => type
+        window.__vite_plugin_react_preamble_installed__ = true
+      </script>
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/components/common/main.jsx"></script>
+    <script type="module" src="http://localhost:5173/src/components/common/main.jsx"></script>
   </body>
 </html>
