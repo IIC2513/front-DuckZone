@@ -119,32 +119,24 @@ function GameBoard() {
     }, [userPlayer, game]);
 
     useEffect(() => {
-        if (game?.card_1 && game?.card_2 && game.updated_cards === false) {
-            game.updated_cards = true;
-            new Promise((resolve) => {
-                setTimeout(() => {
-                    updatePlayedCards().then(() => {
-                        new Promise((resolve1) => {
-                            if (userPlayer.id === game.playerOne) {
-                            setTimeout(() => {
-                                console.log('Resolving turn...');
-                                resolveTurn();
-                                resolve1();
-                            }, 3000);
-                        } else {
-                            setTimeout(() => {
-                                console.log('Waiting for other player to resolve turn...');
-                                resolve1();
-                        }, 3000);
-                    }
-                        });
-                    }).then(() => {
-                        fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${userPlayer.id}/refill_hand`, { method: 'PATCH' });
-                    });
-                    resolve();
-                }, 3000);
-            });
-        }
+        const performTurnActions = async () => {
+            if (game?.card_1 && game?.card_2 && game.updated_cards === false) {
+                game.updated_cards = true;
+                await updatePlayedCards();
+                await new Promise(resolve => setTimeout(resolve, 2000));
+
+                if (userPlayer.id === game.playerOne) {
+                    await resolveTurn();
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                } else {
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                }
+
+                await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${userPlayer.id}/refill_hand`, { method: 'PATCH' });
+            }
+        };
+
+        performTurnActions();
     }, [game, cardsUpdated]);
 
       async function fetchGame() {
@@ -262,6 +254,52 @@ function GameBoard() {
             console.error(`Error playing card ${cardIndex}:`, error);
         }
     };
+
+    const handleSkipTurn = async () => {
+        try {
+            if ((userPlayer.id === game.playerOne && game.card_1 !== null) || (userPlayer.id === game.playerTwo && game.card_2 !== null)) {
+                throw new Error('Error skipping turn');
+            }
+            if (userPlayer.id === game.playerOne) {
+                const playDuckResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${userPlayer.id}/play_duck/6`, { method: 'PATCH' })
+                if (!playDuckResponse.ok || cardOneGame !== null) {
+                    throw new Error('Error skipping turn');
+                }
+                await fetch(`${import.meta.env.VITE_BACKEND_URL}/games/save_card1/${gameId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ cardId: 26 }),
+                });
+            } else if (userPlayer.id === game.playerTwo) {
+                const playDuckResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${userPlayer.id}/play_duck/6`, { method: 'PATCH' })
+                if (!playDuckResponse.ok || cardOneGame !== null) {
+                    throw new Error('Error skipping turn');
+                }
+                await fetch(`${import.meta.env.VITE_BACKEND_URL}/games/save_card2/${gameId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ cardId: 26 }),
+                });
+            }
+        } catch (error) {
+            console.error('Error skipping turn:', error);
+        }
+    };
+
+
+    if (game?.finished) {
+        return (
+            <div className="game-finished">
+                <h1>Partida Terminada</h1>
+                <p>{game.winner} ha ganado.</p>
+                <p>Gracias por jugar!</p>
+            </div>
+        );
+    }
 
     return (
         <>
@@ -397,6 +435,14 @@ function GameBoard() {
                         </div>
                         )}
                         {!cardFive && <div className="card_Game"></div>}
+                        <div 
+                            className={`card_Game selectable`} 
+                            onClick={() => handleSkipTurn()}
+                        >
+                            <p className='mana'></p>
+                            <p className='atk'></p>
+                            <p className='skip_name'>Pasar de Turno</p>
+                        </div>
                     </div>
                 </div>
                 <div className="player-info right-player">
@@ -428,3 +474,4 @@ function GameBoard() {
     }
 
 export default GameBoard;
+    

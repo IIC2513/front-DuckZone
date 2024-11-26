@@ -403,7 +403,18 @@ details summary:hover {
   text-align: center;
   font-weight: 500;
   bottom: -18%;
-  margin-right: 1rem;
+  margin-right: 1.1rem;
+  left: 0;
+  width: 89px;
+  position: relative;
+  align-items: center;
+}
+
+.skip_name {
+  font-size: 11px;
+  text-align: center;
+  font-weight: 500;
+  bottom: -18%;
   left: 0;
   width: 89px;
   position: relative;
