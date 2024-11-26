@@ -496,7 +496,7 @@ details summary:hover {
   margin-top: 150px;
 }
 
-.health-bar, .mana-bar {
+.health-bar-1, .mana-bar-1, .mana-bar-2 {
   width: 20px;
   height: 100px;
   background-color: #ccc;
@@ -505,14 +505,66 @@ details summary:hover {
   position: relative;
 }
 
+.health-bar-2 {
+  width: 20px;
+  height: 100px;
+  background-color: #ccc;
+  border-radius: 10px;
+  margin: 5px 0;
+  margin-bottom: 600%;
+  position: relative;
+}
+
 .health-fill {
   height: 100%;
   background-color: rgb(15, 155, 8);
   border-radius: 10px;
+  position: relative;
 }
 
 .mana-fill {
   height: 100%;
   background-color: rgb(204, 0, 255);
   border-radius: 10px;
+  position: relative;
+}
+
+.health-bar-1::after {
+  content: var(--health-points-1, '10');
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: rgb(0, 0, 0);
+  font-weight: bold;
+}
+
+.mana-bar-1::after {
+  content: var(--mana-1, '10');
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: rgb(0, 0, 0);
+  font-weight: bold;
+}
+
+.health-bar-2::after {
+  content: var(--health-points-2, '10');
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: rgb(0, 0, 0);
+  font-weight: bold;
+}
+
+.mana-bar-2::after {
+  content: var(--mana-2, '10');
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: rgb(0, 0, 0);
+  font-weight: bold;
 }

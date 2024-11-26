@@ -23,7 +23,8 @@ function GameBoard() {
     const [cardFive, setCardFive] = React.useState(null);
     const [cardOneGame, setCardOneGame] = React.useState(null);
     const [cardTwoGame, setCardTwoGame] = React.useState(null);
-    const [cardsUpdated, setCardsUpdated] = React.useState(false);
+    const [cardsBlocked, setCardsBlocked] = React.useState(false);
+    const [played, setPlayed] = React.useState(null);
     const socket = useRef(null);
     const config = {
         method: 'get',
@@ -63,7 +64,7 @@ function GameBoard() {
                     console.warn("WebSocket closed before the connection was established.");
                 }
             });
-        };
+        };  
 
         const handleGameUpdated = (updatedGame) => {
             if (updatedGame.id === gameId) {
@@ -88,6 +89,20 @@ function GameBoard() {
             }
         };
     }, [gameId, userPlayer, otherPlayer]);
+
+    useEffect(() => {
+        const handleUserDisconnected = (disconnectedUserId) => {
+            console.log(`User with ID ${disconnectedUserId} has disconnected.`);
+        };
+
+        socket.current.on("user_disconnected", handleUserDisconnected);
+
+        return () => {
+            if (socket.current) {
+                socket.current.off("user_disconnected", handleUserDisconnected);
+            }
+        };
+    }, []);
     
     useEffect(() => {
           axios(config)
@@ -121,6 +136,11 @@ function GameBoard() {
     useEffect(() => {
         const performTurnActions = async () => {
             if (game?.card_1 && game?.card_2 && game.updated_cards === false) {
+                setCardsBlocked(true);  
+                setTimeout(() => {
+                    setCardsBlocked(false);
+                    setPlayed(false);
+                }, 5500);
                 game.updated_cards = true;
                 await updatePlayedCards();
                 await new Promise(resolve => setTimeout(resolve, 2000));
@@ -137,7 +157,26 @@ function GameBoard() {
         };
 
         performTurnActions();
-    }, [game, cardsUpdated]);
+    }, [game]);
+
+    useEffect(() => {
+        if (userPlayer) {
+            document.documentElement.style.setProperty('--health-points-1', `'${userPlayer.health_points}'`);
+            document.documentElement.style.setProperty('--health-points-2', `'${otherPlayer.health_points}'`);
+            document.documentElement.style.setProperty('--mana-1', `'${userPlayer.actual_mana}'`);
+            document.documentElement.style.setProperty('--mana-2', `'${otherPlayer.actual_mana}'`);
+        }
+      }, [userPlayer]);
+
+    const startGame = async () => {
+        try {
+            await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${userPlayer.id}/refill_hand`, { method: 'PATCH' });
+            await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${otherPlayer.id}/refill_hand`, { method: 'PATCH' });
+            await fetch(`${import.meta.env.VITE_BACKEND_URL}/games/start/${gameId}`, { method: 'PATCH' });
+        } catch (error) {
+            console.error('Error refilling hand:', error);
+        }
+    };
 
       async function fetchGame() {
         try {
@@ -205,6 +244,14 @@ function GameBoard() {
         }
     }
 
+    useEffect(() => {
+        if (game?.started) {
+            fetchGame();
+            fetchPlayers();
+            fetchPlayerCards();
+        }
+    }, [game?.started]);
+
     async function updatePlayedCards() {
         try {
 
@@ -235,7 +282,12 @@ function GameBoard() {
     }
 
     const handleCardClick = async (card, cardIndex) => {
+        if (cardsBlocked || played) {
+            console.log(cardsBlocked, played);
+            return;
+        }
         try {
+            setPlayed(true);
             const playDuckResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${userPlayer.id}/play_duck/${cardIndex}`, { method: 'PATCH' });
             if (!playDuckResponse.ok) {
                 throw new Error(`Error playing card ${cardIndex}`);
@@ -251,18 +303,24 @@ function GameBoard() {
                 body: JSON.stringify({ cardId: card.id }),
             });
         } catch (error) {
+            setPlayed(false);
             console.error(`Error playing card ${cardIndex}:`, error);
         }
     };
 
     const handleSkipTurn = async () => {
+        if (cardsBlocked || played) {
+            console.log(cardsBlocked, played);
+            return;
+        }
         try {
-            if ((userPlayer.id === game.playerOne && game.card_1 !== null) || (userPlayer.id === game.playerTwo && game.card_2 !== null)) {
+            setPlayed(true);
+            if (game.started === false) {
                 throw new Error('Error skipping turn');
             }
             if (userPlayer.id === game.playerOne) {
                 const playDuckResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${userPlayer.id}/play_duck/6`, { method: 'PATCH' })
-                if (!playDuckResponse.ok || cardOneGame !== null) {
+                if (!playDuckResponse.ok) {
                     throw new Error('Error skipping turn');
                 }
                 await fetch(`${import.meta.env.VITE_BACKEND_URL}/games/save_card1/${gameId}`, {
@@ -274,7 +332,7 @@ function GameBoard() {
                 });
             } else if (userPlayer.id === game.playerTwo) {
                 const playDuckResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${userPlayer.id}/play_duck/6`, { method: 'PATCH' })
-                if (!playDuckResponse.ok || cardOneGame !== null) {
+                if (!playDuckResponse.ok) {
                     throw new Error('Error skipping turn');
                 }
                 await fetch(`${import.meta.env.VITE_BACKEND_URL}/games/save_card2/${gameId}`, {
@@ -286,6 +344,7 @@ function GameBoard() {
                 });
             }
         } catch (error) {
+            setPlayed(false);
             console.error('Error skipping turn:', error);
         }
     };
@@ -297,6 +356,7 @@ function GameBoard() {
                 <h1>Partida Terminada</h1>
                 <p>{game.winner} ha ganado.</p>
                 <p>Gracias por jugar!</p>
+                <a href="/">Volver al Inicio</a>
             </div>
         );
     }
@@ -307,20 +367,16 @@ function GameBoard() {
             <br></br>
             <div className='pantallajuego'>
                 <div className="player-info left-player">
-                    <div className="health-bar">
+                    <div className="health-bar-2">
                         <div className="health-fill" style={{ height: `${otherPlayer?.health_points / 50 * 100}%` }}></div>
-                    </div>
-                    <div className="mana-bar">
-                        <div className="mana-fill" style={{ height: `${otherPlayer?.actual_mana / 9 * 100}%` }}></div>
                     </div>
                 </div>
                 <div className='gameboard'>
                     <div className="row top-row">
-                        <div className="card_Game"></div>
-                        <div className="card_Game"></div>
-                        <div className="card_Game"></div>
-                        <div className="card_Game"></div>
-                        <div className="card_Game"></div>
+                        {Array.from({ length: 6 }).map((_, index) => (
+                            <div key={index} className="card_Game"></div>
+                        ))}
+                        
                     </div>
                     <div className="row middle-row">
                         {userPlayer?.id === game?.playerOne ? (
@@ -435,21 +491,22 @@ function GameBoard() {
                         </div>
                         )}
                         {!cardFive && <div className="card_Game"></div>}
-                        <div 
+                        {game?.started === false && ( <div className="card_Game"></div>)}
+                        {game?.started  && (<div 
                             className={`card_Game selectable`} 
                             onClick={() => handleSkipTurn()}
                         >
                             <p className='mana'></p>
                             <p className='atk'></p>
                             <p className='skip_name'>Pasar de Turno</p>
-                        </div>
+                        </div>)}
                     </div>
                 </div>
                 <div className="player-info right-player">
-                    <div className="health-bar">
-                        <div className="health-fill" style={{ height: `${userPlayer?.health_points / 50 * 100}%` }}></div>
+                    <div className="health-bar-1">
+                        <div className="health-fill" style={{ height: `${userPlayer?.health_points / 50 * 100}%`, content: `${userPlayer?.health_points}`}}></div>
                     </div>
-                    <div className="mana-bar">
+                    <div className="mana-bar-1">
                         <div className="mana-fill" style={{ height: `${userPlayer?.actual_mana / 9 * 100}%` }}></div>
                     </div>
                 </div>
@@ -459,15 +516,7 @@ function GameBoard() {
                     <p>Players: {game?.player_count}/2</p>
                 </div>
                 {userPlayer?.id === game?.playerOne && game?.started === false && (
-                <button onClick={async () => {
-                    try {
-                        await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${userPlayer.id}/refill_hand`, { method: 'PATCH' });
-                        await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${otherPlayer.id}/refill_hand`, { method: 'PATCH' });
-                        await fetch(`${import.meta.env.VITE_BACKEND_URL}/games/start/${gameId}`, { method: 'PATCH' });
-                    } catch (error) {
-                        console.error('Error refilling hand:', error);
-                    }
-                }} disabled={game?.player_count !== 2}>Comenzar Partida</button>
+                <button onClick={startGame} disabled={game?.player_count !== 2}>Comenzar Partida</button>
                 )}
             </>
         );
