@@ -30,8 +30,8 @@ function NewReport() {
                     }
                 });
                 if (userResponse.data.id !== playerReporting) {
-                    setPlayerReporting(data.playerTwo);
-                    setPlayerReported(data.playerOne);
+                    setPlayerReporting(userResponse.data.playerTwo);
+                    setPlayerReported(userResponse.data.playerOne);
                 }
             } catch (error) {
                 console.error("Error loading user data:", error);
