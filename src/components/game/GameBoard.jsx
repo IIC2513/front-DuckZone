@@ -321,29 +321,33 @@ function GameBoard() {
 
       useEffect(() => {
         const performTurnActions = async () => {
-            if (game?.card_1 && game?.card_2 && game.updated_cards === false) {
+            if (game?.card_1 && game?.card_2 && !game.updated_cards) {
                 setCardsBlocked(true);  
                 setTimeout(() => {
                     setCardsBlocked(false);
                     setPlayed(false);
                 }, 5500);
-                game.updated_cards = true;
+                setGame(prevGame => ({
+                    ...prevGame,
+                    updated_cards: true,
+                 }));   
                 await updatePlayedCards();
                 await new Promise(resolve => setTimeout(resolve, 2000));
-
+     
                 if (userPlayer.id === game.playerOne) {
                     await resolveTurn();
                     await new Promise(resolve => setTimeout(resolve, 2000));
                 } else {
                     await new Promise(resolve => setTimeout(resolve, 2000));
                 }
-
+     
                 await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${userPlayer.id}/refill_hand`, { method: 'PATCH' });
             }
         };
-
-        performTurnActions();
-    }, [game]);
+     
+        performTurnActions();   
+     }, [game]);
+     
 
     useEffect(() => {
           axios(config)

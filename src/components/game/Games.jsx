@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../auth/AuthContext";
 import { fetchGames } from "../api/sala-de-espera";
 import ToastManager from "../common/toasts/Toast";
+import lock from "../../assets/imgs/padlock.png";
+import unlock from "../../assets/imgs/padlock-unlock.png";
 import "./Games.css";
 import axios from "axios";
 import { io } from "socket.io-client";
@@ -165,7 +167,7 @@ const Games = () => {
                     <li className="gameItem" key={game.id}>
                         <p className="listedGame">{game.room_name}</p>
                         <p className="listedGame">{game.player_count}/2</p>
-                        <img className="locks" src={game.type === 'Private' ? '/src/assets/imgs/padlock.png' : '/src/assets/imgs/padlock-unlock.png'} alt={game.type} />
+                        <img className="locks" src={game.type === 'Private' ? lock : unlock} alt={game.type} />
                         {game.type === 'Standard' ? (
                             <button onClick={() => handleJoinGame(game)}>Unirse</button>
                         ) : (
