@@ -3,46 +3,15 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';
 
 function NewReport() {
-    const { gameId } = useParams();
+    const { gameId, reported_id } = useParams();
     const [playerReporting, setPlayerReporting] = useState('');
     const [playerReported, setPlayerReported] = useState('');
     const [reportText, setReportText] = useState('');
 
     useEffect(() => {
         const token = localStorage.getItem('token');
-
-        const fetchGameData = async () => {
-            try {
-                const response = await axios.get(`/games/${gameId}`);
-                const data = response.data;
-                setPlayerReporting(data.playerOne);
-                setPlayerReported(data.playerTwo);
-                console.log("AAAAAAAAAAAAAAAAAAaaaa")
-            } catch (error) {
-                console.error('Error fetching game data:', error);
-            }
-        };
-
-        const fetchUserData = async () => {
-            try {
-                const userResponse = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/users/current`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                if (userResponse.data.id !== playerReporting) {
-                    setPlayerReporting(userResponse.data.playerTwo);
-                    setPlayerReported(userResponse.data.playerOne);
-                    console.log(playerReported)
-                    console.log(playerReporting)
-                }
-            } catch (error) {
-                console.error("Error loading user data:", error);
-            }
-        };
-
-        fetchGameData();
-        fetchUserData();
+        setPlayerReporting(localStorage.getItem('user_id'));
+        setPlayerReported(reported_id)
     }, [gameId, playerReporting]);
 
     const handleReportSubmit = async () => {
