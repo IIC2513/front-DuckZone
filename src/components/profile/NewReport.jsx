@@ -7,11 +7,26 @@ function NewReport() {
     const [playerReporting, setPlayerReporting] = useState('');
     const [playerReported, setPlayerReported] = useState('');
     const [reportText, setReportText] = useState('');
+    const [userReported,setUserReported]= useState('');
 
     useEffect(() => {
         const token = localStorage.getItem('token');
         setPlayerReporting(localStorage.getItem('user_id'));
         setPlayerReported(reported_id)
+        const fetchUserReported = async () => {
+            try {
+            const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/users/${reported_id}`, {
+                headers: {
+                'Authorization': `Bearer ${token}`
+                }
+            });
+            setUserReported(response.data.username);
+            } catch (error) {
+            console.error('Error fetching reported user data:', error);
+            }
+        };
+
+        fetchUserReported();
     }, [gameId, playerReporting]);
 
     const handleReportSubmit = async () => {
@@ -37,13 +52,14 @@ function NewReport() {
     return (
         <div>
             <h1>Reportar</h1>
-            <h3>Estás reportando a {playerReported}</h3>
+            <h3>Estás reportando a {userReported}</h3>
             <p>Por favor, explícanos un poco más al respecto:</p>
             <input 
                 type="text" 
                 placeholder="Escribe aquí..." 
                 value={reportText}
                 onChange={(e) => setReportText(e.target.value)}
+                className='cosotexto'
             />
             <br />
             <button onClick={handleReportSubmit}>Enviar Reporte</button>

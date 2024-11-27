@@ -43,6 +43,15 @@
   padding-left: 10px;
   padding-right: 10px;
 }
+.cosotexto{
+  width: 100%;
+  height: 100px;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+}
 .elemento {
   padding: 10px;
   border-left: 1px solid #ccc;
