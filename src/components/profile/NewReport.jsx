@@ -17,6 +17,7 @@ function NewReport() {
                 const data = response.data;
                 setPlayerReporting(data.playerOne);
                 setPlayerReported(data.playerTwo);
+                console.log("AAAAAAAAAAAAAAAAAAaaaa")
             } catch (error) {
                 console.error('Error fetching game data:', error);
             }
@@ -32,6 +33,8 @@ function NewReport() {
                 if (userResponse.data.id !== playerReporting) {
                     setPlayerReporting(userResponse.data.playerTwo);
                     setPlayerReported(userResponse.data.playerOne);
+                    console.log(playerReported)
+                    console.log(playerReporting)
                 }
             } catch (error) {
                 console.error("Error loading user data:", error);
