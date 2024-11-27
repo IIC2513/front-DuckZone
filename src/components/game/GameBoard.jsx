@@ -201,6 +201,7 @@ function GameBoard() {
     }
 
     async function updatePlayedCards() {
+        console.log('step 5');
         try {
 
                 await fetch(`${import.meta.env.VITE_BACKEND_URL}/games/updateplayedcards/${gameId}`, {
@@ -216,6 +217,7 @@ function GameBoard() {
     }
 
     async function resolveTurn() {
+        console.log('step 8');
         try {
             await fetch(`${import.meta.env.VITE_BACKEND_URL}/games/resolve/${gameId}`, { 
                 method: 'PATCH',
@@ -250,6 +252,7 @@ function GameBoard() {
                 },
                 body: JSON.stringify({ cardId: card.id }),
             });
+            console.log('step 1');
         } catch (error) {
             setPlayed(false);
             console.error(`Error playing card ${cardIndex}:`, error);
@@ -324,27 +327,30 @@ function GameBoard() {
         const performTurnActions = async () => {
             if (game?.card_1 && game?.card_2 && !game.updated_cards) {
                 setCardsBlocked(true);  
-                
+                console.log('step 2');
                 setTimeout(() => {
                     flushSync(() => {
                     setCardsBlocked(false);
                     setPlayed(false);
                     });
                 }, 5500);
+                console.log('step 3');
                 setGame(prevGame => ({
                     ...prevGame,
                     updated_cards: true,
                  }));   
+                console.log('step 4');
                 await updatePlayedCards();
                 await new Promise(resolve => setTimeout(resolve, 2000));
-     
+                console.log('step 6');
                 if (userPlayer.id === game.playerOne) {
+                    console.log('step 7');
                     await resolveTurn();
                     await new Promise(resolve => setTimeout(resolve, 2000));
                 } else {
                     await new Promise(resolve => setTimeout(resolve, 2000));
                 }
-     
+                console.log('step 9');
                 await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${userPlayer.id}/refill_hand`, { method: 'PATCH' });
             }
         };
