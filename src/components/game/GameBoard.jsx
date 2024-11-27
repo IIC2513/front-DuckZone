@@ -3,399 +3,208 @@ import { useParams } from 'react-router-dom';
 import { flushSync } from 'react-dom';
 import { AuthContext } from '../auth/AuthContext';
 import axios from 'axios';
-import io from "socket.io-client";
-import ReactDOM from "react-dom/client";
-
+import io from 'socket.io-client';
 
 function GameBoard() {
+  const { token } = useContext(AuthContext);
+  const { id } = useParams();
+  const gameId = parseInt(id, 10);
+  const [game, setGame] = useState(null);
+  const [userId, setUserId] = useState(null);
+  const [userPlayer, setUserPlayer] = useState(null);
+  const [otherPlayer, setOtherPlayer] = useState(null);
+  const [cardOne, setCardOne] = useState(null);
+  const [cardTwo, setCardTwo] = useState(null);
+  const [cardThree, setCardThree] = useState(null);
+  const [cardFour, setCardFour] = useState(null);
+  const [cardFive, setCardFive] = useState(null);
+  const [cardOneGame, setCardOneGame] = useState(null);
+  const [cardTwoGame, setCardTwoGame] = useState(null);
+  const [cardsBlocked, setCardsBlocked] = useState(false);
+  const [played, setPlayed] = useState(false);
+  const socket = useRef(null);
+  
+  const config = {
+    method: 'get',
+    url: `${import.meta.env.VITE_BACKEND_URL}/scope-example/protecteduser`,
+    headers: { 'Authorization': `Bearer ${token}` },
+  };
 
-    const { token } = useContext(AuthContext)
-    const { id } = useParams();
-    const gameId = parseInt(id, 10);
-    const [game, setGame] = React.useState(null);
-    const [userId, setUserId] = useState(null);
-    const [msg, setMsg] = useState("");
-    const [userPlayer, setUserPlayer] = React.useState(null);
-    const [otherPlayer, setOtherPlayer] = React.useState(null);
-    const [cardOne, setCardOne] = React.useState(null);
-    const [cardTwo, setCardTwo] = React.useState(null);
-    const [cardThree, setCardThree] = React.useState(null);
-    const [cardFour, setCardFour] = React.useState(null);
-    const [cardFive, setCardFive] = React.useState(null);
-    const [cardOneGame, setCardOneGame] = React.useState(null);
-    const [cardTwoGame, setCardTwoGame] = React.useState(null);
-    const [cardsBlocked, setCardsBlocked] = React.useState(false);
-    const [played, setPlayed] = React.useState(false);
-    const socket = useRef(null);
-    const config = {
-        method: 'get',
-        url: `${import.meta.env.VITE_BACKEND_URL}/scope-example/protecteduser`,
-        headers: { 
-          'Authorization': `Bearer ${token}`,
-        }
+  // Connect to the socket server
+  useEffect(() => {
+    const connectSocket = () => {
+      socket.current = io(import.meta.env.VITE_BACKEND_URL, {
+        transports: ['websocket'],
+        reconnectionAttempts: 5,
+        reconnectionDelay: 1000,
+      });
+
+      socket.current.on("game_updated", handleGameUpdated);
+      socket.current.on("player_updated", handlePlayerUpdated);
+      socket.current.on("player_disconnect", handleDisconnect);
+
+      socket.current.on("disconnect", () => console.warn("WebSocket disconnected. Attempting to reconnect..."));
+      socket.current.on("reconnect_failed", () => console.error("WebSocket reconnection failed."));
     };
 
-    useEffect(() => {
-        const connectSocket = () => {
-            socket.current = io(import.meta.env.VITE_BACKEND_URL, {
-                transports: ['websocket'],
-                reconnectionAttempts: 5,
-                reconnectionDelay: 1000,
-            });
+    connectSocket();
 
-            socket.current.on("connection_error", (err) => {
-                console.log(err.req);      // the request object
-                console.log(err.code);     // the error code, for example 1
-                console.log(err.message);  // the error message, for example "Session ID unknown"
-                console.log(err.context);  // some additional error context
-              });
-
-            socket.current.on("connect_error", (error) => {
-                console.error("WebSocket connection error:", error);
-                // addToast("Error de conexión WebSocket", "error");
-            });
-
-            socket.current.on("game_updated", handleGameUpdated);
-            socket.current.on("player_updated", handlePlayerUpdated);
-            socket.current.on("player_disconnect", handleDisconnect);
-
-            socket.current.on("disconnect", () => {
-                console.warn("WebSocket disconnected. Attempting to reconnect...");
-            });
-
-            socket.current.on("reconnect_failed", () => {
-                console.error("WebSocket reconnection failed.");
-                addToast("Error de reconexión WebSocket", "error");
-            });
-
-            socket.current.on("close", (reason) => {
-                if (reason === "transport close") {
-                    console.warn("WebSocket closed before the connection was established.");
-                }
-            });
-        };  
-
-        const handleUnload = (event) => {
-            handleDisconnect();
-          };
-
-        window.addEventListener('beforeunload', handleUnload);
-        window.addEventListener('unload', handleUnload);
-
-        const handleDisconnect = async () => {
-            console.log("User disconnected");
-            if (userPlayer) {
-              try {
-                await fetch(`${import.meta.env.VITE_BACKEND_URL}/games/winbywalkover/${gameId}`, {
-                  method: 'PATCH',
-                  headers: {
-                    'Content-Type': 'application/json',
-                  },
-                  body: JSON.stringify({ playerId: userPlayer.id }),
-                });
-              } catch (error) {
-                console.error('Error handling disconnect:', error);
-              }
-            }
-          };
-
-        const handleGameUpdated = (updatedGame) => {
-            if (updatedGame.id === gameId) {
-                setGame(updatedGame);
-            }
-        };
-
-        const handlePlayerUpdated = (updatedPlayer) => {
-            if (updatedPlayer.id === userPlayer?.id) {
-                setUserPlayer(updatedPlayer);
-            } else if (updatedPlayer.id === otherPlayer?.id) {
-                setOtherPlayer(updatedPlayer);
-            }
-        };
-
-        connectSocket();
-
-        return () => {
-            // if (socket.current) {
-                socket.current.off("player_disconnect", handleDisconnect);
-                socket.current.off("game_updated", handleGameUpdated);
-                socket.current.off("player_updated", handlePlayerUpdated);
-            // }
-        };
-    }, [gameId, userPlayer, otherPlayer]);
-
-    const startGame = async () => {
-        try {
-            await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${userPlayer.id}/refill_hand`, { method: 'PATCH' });
-            await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${otherPlayer.id}/refill_hand`, { method: 'PATCH' });
-            await fetch(`${import.meta.env.VITE_BACKEND_URL}/games/start/${gameId}`, { method: 'PATCH' });
-        } catch (error) {
-            console.error('Error refilling hand:', error);
-        }
+    return () => {
+      if (socket.current) {
+        socket.current.off("game_updated", handleGameUpdated);
+        socket.current.off("player_updated", handlePlayerUpdated);
+        socket.current.off("player_disconnect", handleDisconnect);
+      }
     };
+  }, [gameId, userPlayer, otherPlayer]);
 
-      async function fetchGame() {
-        try {
-            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/games/${gameId}`);
-            const data = await response.json();
-            setGame(data);
-        } catch (error) {
-            console.error('Error fetching game data:', error);
-        }
+  // Handle game updates
+  const handleGameUpdated = (updatedGame) => {
+    if (updatedGame.id === gameId) {
+      setGame(updatedGame);
     }
+  };
 
-    async function fetchPlayers() {
-        if (game) {
-            try {
-                const playerOneResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${game.playerOne}`);
-                const playerOneData = await playerOneResponse.json();
-                const playerTwoResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${game.playerTwo}`);
-                const playerTwoData = await playerTwoResponse.json();
-                if (playerOneData.userId == userId) {
-                    setUserPlayer(playerOneData);
-                    setOtherPlayer(playerTwoData);
-                } else if (playerTwoData.userId == userId) {
-                    setUserPlayer(playerTwoData);
-                    setOtherPlayer(playerOneData);
-                }
-            } catch (error) {
-                console.error('Error fetching players data:', error);
-            }
-        }
+  const handlePlayerUpdated = (updatedPlayer) => {
+    if (updatedPlayer.id === userPlayer?.id) {
+      setUserPlayer(updatedPlayer);
+    } else if (updatedPlayer.id === otherPlayer?.id) {
+      setOtherPlayer(updatedPlayer);
     }
+  };
 
-    async function fetchCard(cardId) {
-        try {
-            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/cards/${cardId}`);
-            const data = await response.json();
-            return data;
-        } catch (error) {
-            console.error('Error fetching card data:', error);
-            return null;
-        }
+  const handleDisconnect = async () => {
+    if (userPlayer) {
+      try {
+        await fetch(`${import.meta.env.VITE_BACKEND_URL}/games/winbywalkover/${gameId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ playerId: userPlayer.id }),
+        });
+      } catch (error) {
+        console.error('Error handling disconnect:', error);
+      }
     }
+  };
 
-    async function fetchPlayerCards() {
-        if (userPlayer) {
-            const cardIds = [
-                userPlayer.cardOneId,
-                userPlayer.cardTwoId,
-                userPlayer.cardThreeId,
-                userPlayer.cardFourId,
-                userPlayer.cardFiveId,
-                game.card_1,
-                game.card_2,
-            ];
-
-            const cardPromises = cardIds.map(cardId => cardId ? fetchCard(cardId).catch(() => null) : Promise.resolve(null));
-            const cards = await Promise.all(cardPromises);
-
-            setCardOne(cards[0]);
-            setCardTwo(cards[1]);
-            setCardThree(cards[2]);
-            setCardFour(cards[3]);
-            setCardFive(cards[4]);
-            setCardOneGame(cards[5]);
-            setCardTwoGame(cards[6]);
-        }
-    }
-
-    async function updatePlayedCards() {
-        console.log('step 5');
-        try {
-
-                await fetch(`${import.meta.env.VITE_BACKEND_URL}/games/updateplayedcards/${gameId}`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ playerId: userPlayer.id }),
-            });
-        } catch (error) {
-            console.error('Error updating played cards:', error);
-        }
-    }
-
-    async function resolveTurn() {
-        console.log('step 8');
-        try {
-            await fetch(`${import.meta.env.VITE_BACKEND_URL}/games/resolve/${gameId}`, { 
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ playerId: userPlayer.id }),
-            });
-        } catch (error) {
-            console.error('Error resolving turn:', error);
-        }
-    }
-
-    const handleCardClick = async (card, cardIndex) => {
-        if (cardsBlocked || played) {
-            console.log(cardsBlocked, played);
-            return;
-        }
-        try {
-            setPlayed(true);
-            const playDuckResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${userPlayer.id}/play_duck/${cardIndex}`, { method: 'PATCH' });
-            if (!playDuckResponse.ok) {
-                throw new Error(`Error playing card ${cardIndex}`);
-            }
-            const saveCardUrl = userPlayer.id === game.playerOne 
-                ? `${import.meta.env.VITE_BACKEND_URL}/games/save_card1/${gameId}` 
-                : `${import.meta.env.VITE_BACKEND_URL}/games/save_card2/${gameId}`;
-            await fetch(saveCardUrl, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ cardId: card.id }),
-            });
-            console.log('step 1');
-        } catch (error) {
-            setPlayed(false);
-            console.error(`Error playing card ${cardIndex}:`, error);
-        }
+  // Fetch game data
+  useEffect(() => {
+    const fetchGame = async () => {
+      try {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/games/${gameId}`);
+        const data = await response.json();
+        setGame(data);
+      } catch (error) {
+        console.error('Error fetching game data:', error);
+      }
     };
+    fetchGame();
+  }, [gameId]);
 
-    const handleSkipTurn = async () => {
-        if (cardsBlocked || played) {
-            console.log(cardsBlocked, played);
-            return;
-        }
+  // Fetch players data
+  useEffect(() => {
+    const fetchPlayers = async () => {
+      if (game) {
         try {
-            setPlayed(true);
-            if (game.started === false) {
-                throw new Error('Error skipping turn');
-            }
-            if (userPlayer.id === game.playerOne) {
-                const playDuckResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${userPlayer.id}/play_duck/6`, { method: 'PATCH' })
-                if (!playDuckResponse.ok) {
-                    throw new Error('Error skipping turn');
-                }
-                await fetch(`${import.meta.env.VITE_BACKEND_URL}/games/save_card1/${gameId}`, {
-                    method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ cardId: 26 }),
-                });
-            } else if (userPlayer.id === game.playerTwo) {
-                const playDuckResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${userPlayer.id}/play_duck/6`, { method: 'PATCH' })
-                if (!playDuckResponse.ok) {
-                    throw new Error('Error skipping turn');
-                }
-                await fetch(`${import.meta.env.VITE_BACKEND_URL}/games/save_card2/${gameId}`, {
-                    method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ cardId: 26 }),
-                });
-            }
+          const playerOneResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${game.playerOne}`);
+          const playerOneData = await playerOneResponse.json();
+          const playerTwoResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${game.playerTwo}`);
+          const playerTwoData = await playerTwoResponse.json();
+          if (playerOneData.userId === userId) {
+            setUserPlayer(playerOneData);
+            setOtherPlayer(playerTwoData);
+          } else if (playerTwoData.userId === userId) {
+            setUserPlayer(playerTwoData);
+            setOtherPlayer(playerOneData);
+          }
         } catch (error) {
-            setPlayed(false);
-            console.error('Error skipping turn:', error);
+          console.error('Error fetching players data:', error);
         }
+      }
     };
+    fetchPlayers();
+  }, [game, userId]);
 
-    useEffect(() => {
-        fetchGame();
-        fetchPlayers();
-        fetchPlayerCards();
-    }, []);
+  // Handle card fetching for the player
+  const fetchCard = async (cardId) => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/cards/${cardId}`);
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching card data:', error);
+      return null;
+    }
+  };
 
-    useEffect(() => {
-        if (game?.started) {
-            fetchGame();
-            fetchPlayers();
-            fetchPlayerCards();
-        }
-    }, [game?.started]);
+  // Fetch the player's cards
+  useEffect(() => {
+    const fetchPlayerCards = async () => {
+      if (userPlayer) {
+        const cardIds = [
+          userPlayer.cardOneId, userPlayer.cardTwoId,
+          userPlayer.cardThreeId, userPlayer.cardFourId,
+          userPlayer.cardFiveId, game.card_1, game.card_2
+        ];
+        
+        const cards = await Promise.all(cardIds.map(cardId => cardId ? fetchCard(cardId) : null));
+        setCardOne(cards[0]);
+        setCardTwo(cards[1]);
+        setCardThree(cards[2]);
+        setCardFour(cards[3]);
+        setCardFive(cards[4]);
+        setCardOneGame(cards[5]);
+        setCardTwoGame(cards[6]);
+      }
+    };
+    if (userPlayer) fetchPlayerCards();
+  }, [userPlayer, game]);
 
-    useEffect(() => {
-        if (game?.finished) {
-            fetchGame();
-        }
-    }, [game?.finished]);
+  // Actions for playing a card or skipping turn
+  const handleCardClick = async (card, cardIndex) => {
+    if (cardsBlocked || played) return;
 
-    useEffect(() => {
-        if (userPlayer) {
-            document.documentElement.style.setProperty('--health-points-1', `'${userPlayer.health_points}'`);
-            document.documentElement.style.setProperty('--health-points-2', `'${otherPlayer.health_points}'`);
-            document.documentElement.style.setProperty('--mana-1', `'${userPlayer.actual_mana}'`);
-            document.documentElement.style.setProperty('--mana-2', `'${otherPlayer.actual_mana}'`);
-        }
-      }, [userPlayer]);
+    setPlayed(true);
+    try {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${userPlayer.id}/play_duck/${cardIndex}`, { method: 'PATCH' });
+      if (!response.ok) throw new Error(`Error playing card ${cardIndex}`);
+      const saveCardUrl = userPlayer.id === game.playerOne
+        ? `${import.meta.env.VITE_BACKEND_URL}/games/save_card1/${gameId}`
+        : `${import.meta.env.VITE_BACKEND_URL}/games/save_card2/${gameId}`;
+      await fetch(saveCardUrl, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cardId: card.id }),
+      });
+    } catch (error) {
+      setPlayed(false);
+      console.error(`Error playing card ${cardIndex}:`, error);
+    }
+  };
 
-      useEffect(() => {
-        const performTurnActions = async () => {
-            if (game?.card_1 && game?.card_2 && !game.updated_cards) {
-                setCardsBlocked(true);  
-                console.log('step 2');
-                setTimeout(() => {
-                    flushSync(() => {
-                    setCardsBlocked(false);
-                    setPlayed(false);
-                    });
-                }, 7000);
-                console.log('step 3');
-                setGame(prevGame => ({
-                    ...prevGame,
-                    updated_cards: true,
-                 }));   
-                console.log('step 4');
-                await updatePlayedCards();
-                await new Promise(resolve => setTimeout(resolve, 2000));
-                console.log('step 6');
-                while (userPlayer ===null) {
-                    await new Promise(resolve => setTimeout(resolve, 250));
-                }
-                if (userPlayer.id === game.playerOne) {
-                    console.log('step 7');
-                    await resolveTurn();
-                    await new Promise(resolve => setTimeout(resolve, 2000));
-                } else {
-                    await new Promise(resolve => setTimeout(resolve, 2000));
-                }
-                console.log('step 9');
-                await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${userPlayer.id}/refill_hand`, { method: 'PATCH' });
-            }
-        };
-     
-        performTurnActions();   
-     }, [game]);
-     
+  const handleSkipTurn = async () => {
+    if (cardsBlocked || played) return;
 
-    useEffect(() => {
-          axios(config)
-              .then((response) => {
-                  setMsg(response.data.message);
-                  setUserId(response.data.user.sub);
-              })
-              .catch((error) => {
-                  console.error("Invalid token");
-                  console.error(error);
-                  setMsg("not logged");
-              });
-      }, []);
-             
-    useEffect(() => {
-        fetchGame();
-    }, [gameId]);
+    setPlayed(true);
+    try {
+      if (game.started === false) throw new Error('Game not started');
 
-    useEffect(() => {
-        if (game) {
-        fetchPlayers();
-        }
-    }, [game]);
+      const playDuckResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${userPlayer.id}/play_duck/6`, { method: 'PATCH' });
+      if (!playDuckResponse.ok) throw new Error('Error skipping turn');
 
-    useEffect(() => {
-        if (game) {
-        fetchPlayerCards();
-        }
-    }, [userPlayer, game]);
+      const saveCardUrl = userPlayer.id === game.playerOne
+        ? `${import.meta.env.VITE_BACKEND_URL}/games/save_card1/${gameId}`
+        : `${import.meta.env.VITE_BACKEND_URL}/games/save_card2/${gameId}`;
+
+      await fetch(saveCardUrl, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cardId: 26 }),
+      });
+    } catch (error) {
+      setPlayed(false);
+      console.error('Error skipping turn:', error);
+    }
+  };
 
 
     if (game?.finished) {
