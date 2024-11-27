@@ -198,6 +198,8 @@ function GameBoard() {
             const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/games/${gameId}`);
             const data = await response.json();
             setGame(data);
+            setCardOneGame(data.card_1 ? await fetchCard(data.card_1) : null);
+            setCardTwoGame(data.card_2 ? await fetchCard(data.card_2) : null);
         } catch (error) {
             console.error('Error fetching game data:', error);
         }
