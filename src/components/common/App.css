@@ -39,7 +39,10 @@
   font-weight: bold;
   background-color: #f0f0f0;
 }
-
+.elementouuu{
+  padding-left: 10px;
+  padding-right: 10px;
+}
 .elemento {
   padding: 10px;
   border-left: 1px solid #ccc;
@@ -567,6 +570,15 @@ details summary:hover {
   border-radius: 10px;
   position: relative;
 }
+
+.player-count{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+
 
 .mana-fill {
   height: 100%;
