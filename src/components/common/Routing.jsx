@@ -20,6 +20,7 @@ import GameBoard from '../game/GameBoard';
 import Reports from '../admin/ReportList';
 import AdminFooter from '../admin/Footer';
 import Users from '../admin/UserList';
+import JoinPrivate from '../game/JoinPrivate';
 function Routing() {
     return(
         <>
@@ -45,6 +46,7 @@ function Routing() {
                 <Route path="/adm/users" element={<Users />} />
                 <Route path="/admincheck" element={<AdminCheck />} />
                 <Route path="/games/:id" element={<GameBoard />} /> 
+                <Route path="/joinprivate/:id" element={<JoinPrivate />} />
                 <Route path="*" element={<h1>404 Not Found</h1>} />
             </Routes>
             <AdminFooter />
