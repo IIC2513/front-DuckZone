@@ -49,7 +49,7 @@ function GameBoard() {
 
             socket.current.on("game_updated", handleGameUpdated);
             socket.current.on("player_updated", handlePlayerUpdated);
-            socket.current.on("disconnect", handleDisconnect);
+            socket.current.on("player_disconnect", handleDisconnect);
 
             socket.current.on("disconnect", () => {
                 console.warn("WebSocket disconnected. Attempting to reconnect...");
@@ -109,7 +109,7 @@ function GameBoard() {
 
         return () => {
             if (socket.current) {
-                socket.current.off("disconnect", handleDisconnect);
+                socket.current.off("player_disconnect", handleDisconnect);
                 socket.current.off("game_updated", handleGameUpdated);
                 socket.current.off("player_updated", handlePlayerUpdated);
             }
