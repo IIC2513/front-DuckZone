@@ -160,13 +160,17 @@ const Games = () => {
                 <button>Crear Juego</button>
             </Link>
             <h2>Juegos Disponibles:</h2>
-            <ul>
-                {games.map(game => (
-                    <li key={game.id}>
+            <ul className="gameList">
+                {games.filter(game => game.player_count < 2 && !game.started).map(game => (
+                    <li className="gameItem" key={game.id}>
                         <p className="listedGame">{game.room_name}</p>
                         <p className="listedGame">{game.player_count}/2</p>
                         <img className="locks" src={game.type === 'Private' ? '/src/assets/imgs/padlock.png' : '/src/assets/imgs/padlock-unlock.png'} alt={game.type} />
-                        <button onClick={() => handleJoinGame(game)}>Unirse</button>
+                        {game.type === 'Public' ? (
+                            <button onClick={() => handleJoinGame(game)}>Unirse</button>
+                        ) : (
+                            <button onClick={() => navigate(`/joinprivate/${game.id}`)}>Unirse</button>
+                        )}
                     </li>
                 ))}
             </ul>
