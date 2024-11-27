@@ -61,10 +61,11 @@ function NewReport() {
                 onChange={(e) => setReportText(e.target.value)}
                 className='cosotexto'
             />
-            <br />
+            <br></br>
             <button onClick={handleReportSubmit}>Enviar Reporte</button>
-            <br />
+            <br></br>
             <a href='/'>Volver al Inicio</a>
+            <br></br>
         </div>
     );
 }

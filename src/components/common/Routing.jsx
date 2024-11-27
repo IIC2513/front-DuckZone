@@ -20,6 +20,7 @@ import GameBoard from '../game/GameBoard';
 import Reports from '../admin/ReportList';
 import AdminFooter from '../admin/Footer';
 import Users from '../admin/UserList';
+import Report from '../admin/AnalyzeReport';
 import JoinPrivate from '../game/JoinPrivate';
 function Routing() {
     return(
@@ -43,6 +44,7 @@ function Routing() {
                 <Route path="/newprivate" element={<NewPrivate />} />
                 <Route path="/usercheck" element={<UserCheck />} />
                 <Route path="/adm/reports" element={<Reports />} />
+                <Route path="/adm/reports/:id" element={<Report />} />
                 <Route path="/adm/users" element={<Users />} />
                 <Route path="/admincheck" element={<AdminCheck />} />
                 <Route path="/games/:id" element={<GameBoard />} /> 
