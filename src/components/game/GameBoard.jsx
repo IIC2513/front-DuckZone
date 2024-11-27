@@ -333,7 +333,7 @@ function GameBoard() {
                     setCardsBlocked(false);
                     setPlayed(false);
                     });
-                }, 5500);
+                }, 7000);
                 console.log('step 3');
                 setGame(prevGame => ({
                     ...prevGame,
@@ -343,6 +343,9 @@ function GameBoard() {
                 await updatePlayedCards();
                 await new Promise(resolve => setTimeout(resolve, 2000));
                 console.log('step 6');
+                while (userPlayer ===null) {
+                    await new Promise(resolve => setTimeout(resolve, 250));
+                }
                 if (userPlayer.id === game.playerOne) {
                     console.log('step 7');
                     await resolveTurn();
