@@ -5,7 +5,7 @@ import { fetchGames } from "../api/sala-de-espera";
 import ToastManager from "../common/toasts/Toast";
 import "./Games.css";
 import axios from "axios";
-import io from "socket.io-client";
+import { io } from "socket.io-client";
 
 const Games = () => {
     const [games, setGames] = useState([]);
@@ -166,7 +166,7 @@ const Games = () => {
                         <p className="listedGame">{game.room_name}</p>
                         <p className="listedGame">{game.player_count}/2</p>
                         <img className="locks" src={game.type === 'Private' ? '/src/assets/imgs/padlock.png' : '/src/assets/imgs/padlock-unlock.png'} alt={game.type} />
-                        {game.type === 'Public' ? (
+                        {game.type === 'Standard' ? (
                             <button onClick={() => handleJoinGame(game)}>Unirse</button>
                         ) : (
                             <button onClick={() => navigate(`/joinprivate/${game.id}`)}>Unirse</button>
