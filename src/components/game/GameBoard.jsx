@@ -42,6 +42,13 @@ function GameBoard() {
                 reconnectionDelay: 1000,
             });
 
+            socket.current.on("connection_error", (err) => {
+                console.log(err.req);      // the request object
+                console.log(err.code);     // the error code, for example 1
+                console.log(err.message);  // the error message, for example "Session ID unknown"
+                console.log(err.context);  // some additional error context
+              });
+
             socket.current.on("connect_error", (error) => {
                 console.error("WebSocket connection error:", error);
                 // addToast("Error de conexión WebSocket", "error");
@@ -108,80 +115,13 @@ function GameBoard() {
         connectSocket();
 
         return () => {
-            if (socket.current) {
+            // if (socket.current) {
                 socket.current.off("player_disconnect", handleDisconnect);
                 socket.current.off("game_updated", handleGameUpdated);
                 socket.current.off("player_updated", handlePlayerUpdated);
-            }
+            // }
         };
     }, [gameId, userPlayer, otherPlayer]);
-    
-   
-
-
-    useEffect(() => {
-          axios(config)
-              .then((response) => {
-                  setMsg(response.data.message);
-                  setUserId(response.data.user.sub);
-              })
-              .catch((error) => {
-                  console.error("Invalid token");
-                  console.error(error);
-                  setMsg("not logged");
-              });
-      }, []);
-             
-    useEffect(() => {
-        fetchGame();
-    }, [gameId]);
-
-    useEffect(() => {
-        if (game) {
-        fetchPlayers();
-        }
-    }, [game]);
-
-    useEffect(() => {
-        if (game) {
-        fetchPlayerCards();
-        }
-    }, [userPlayer, game]);
-
-    useEffect(() => {
-        const performTurnActions = async () => {
-            if (game?.card_1 && game?.card_2 && game.updated_cards === false) {
-                setCardsBlocked(true);  
-                setTimeout(() => {
-                    setCardsBlocked(false);
-                    setPlayed(false);
-                }, 5500);
-                game.updated_cards = true;
-                await updatePlayedCards();
-                await new Promise(resolve => setTimeout(resolve, 2000));
-
-                if (userPlayer.id === game.playerOne) {
-                    await resolveTurn();
-                    await new Promise(resolve => setTimeout(resolve, 2000));
-                } else {
-                    await new Promise(resolve => setTimeout(resolve, 2000));
-                }
-
-                await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${userPlayer.id}/refill_hand`, { method: 'PATCH' });
-            }
-        };
-
-        performTurnActions();
-    }, [game]);
-
-    useEffect(() => {
-        if (userPlayer) {
-            document.documentElement.style.setProperty('--health-points-1', `'${userPlayer.health_points}'`);
-            document.documentElement.style.setProperty('--health-points-2', `'${otherPlayer.health_points}'`);
-            document.documentElement.style.setProperty('--mana-1', `'${userPlayer.actual_mana}'`);
-            document.documentElement.style.setProperty('--mana-2', `'${otherPlayer.actual_mana}'`);
-        }
-      }, [userPlayer]);
 
     const startGame = async () => {
         try {
@@ -258,20 +198,6 @@ function GameBoard() {
             setCardTwoGame(cards[6]);
         }
     }
-
-    useEffect(() => {
-        if (game?.started) {
-            fetchGame();
-            fetchPlayers();
-            fetchPlayerCards();
-        }
-    }, [game?.started]);
-
-    useEffect(() => {
-        if (game?.finished) {
-            fetchGame();
-        }
-    }, [game?.finished]);
 
     async function updatePlayedCards() {
         try {
@@ -369,6 +295,84 @@ function GameBoard() {
             console.error('Error skipping turn:', error);
         }
     };
+
+    useEffect(() => {
+        if (game?.started) {
+            fetchGame();
+            fetchPlayers();
+            fetchPlayerCards();
+        }
+    }, [game?.started]);
+
+    useEffect(() => {
+        if (game?.finished) {
+            fetchGame();
+        }
+    }, [game?.finished]);
+
+    useEffect(() => {
+        if (userPlayer) {
+            document.documentElement.style.setProperty('--health-points-1', `'${userPlayer.health_points}'`);
+            document.documentElement.style.setProperty('--health-points-2', `'${otherPlayer.health_points}'`);
+            document.documentElement.style.setProperty('--mana-1', `'${userPlayer.actual_mana}'`);
+            document.documentElement.style.setProperty('--mana-2', `'${otherPlayer.actual_mana}'`);
+        }
+      }, [userPlayer]);
+
+      useEffect(() => {
+        const performTurnActions = async () => {
+            if (game?.card_1 && game?.card_2 && game.updated_cards === false) {
+                setCardsBlocked(true);  
+                setTimeout(() => {
+                    setCardsBlocked(false);
+                    setPlayed(false);
+                }, 5500);
+                game.updated_cards = true;
+                await updatePlayedCards();
+                await new Promise(resolve => setTimeout(resolve, 2000));
+
+                if (userPlayer.id === game.playerOne) {
+                    await resolveTurn();
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                } else {
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                }
+
+                await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${userPlayer.id}/refill_hand`, { method: 'PATCH' });
+            }
+        };
+
+        performTurnActions();
+    }, [game]);
+
+    useEffect(() => {
+          axios(config)
+              .then((response) => {
+                  setMsg(response.data.message);
+                  setUserId(response.data.user.sub);
+              })
+              .catch((error) => {
+                  console.error("Invalid token");
+                  console.error(error);
+                  setMsg("not logged");
+              });
+      }, []);
+             
+    useEffect(() => {
+        fetchGame();
+    }, [gameId]);
+
+    useEffect(() => {
+        if (game) {
+        fetchPlayers();
+        }
+    }, [game]);
+
+    useEffect(() => {
+        if (game) {
+        fetchPlayerCards();
+        }
+    }, [userPlayer, game]);
 
 
     if (game?.finished) {
