@@ -155,16 +155,16 @@ function GameBoard() {
                 setTimeout(() => {
                     setCardsBlocked(false);
                     setPlayed(false);
-                }, 5500);
+                }, 8000);
                 game.updated_cards = true;
                 await updatePlayedCards();
-                await new Promise(resolve => setTimeout(resolve, 2000));
+                await new Promise(resolve => setTimeout(resolve, 3000));
 
                 if (userPlayer.id === game.playerOne) {
                     await resolveTurn();
-                    await new Promise(resolve => setTimeout(resolve, 2000));
+                    await new Promise(resolve => setTimeout(resolve, 3000));
                 } else {
-                    await new Promise(resolve => setTimeout(resolve, 2000));
+                    await new Promise(resolve => setTimeout(resolve, 3500));
                 }
 
                 await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${userPlayer.id}/refill_hand`, { method: 'PATCH' });
