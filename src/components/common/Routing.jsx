@@ -32,7 +32,7 @@ function Routing() {
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/editprofile" element={<EditProfile />} />
                 <Route path="/newgame" element={<NewGame />} />
-                <Route path="/newreport" element={<NewReport />} />
+                <Route path="/newreport/:id" element={<NewReport />} />
                 <Route path="/cards" element={<Cards />} />
                 <Route path="/ranking" element={<Ranking />} />
                 <Route path="/login" element={<Login />} />

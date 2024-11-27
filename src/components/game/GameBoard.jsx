@@ -552,7 +552,8 @@ function GameBoard() {
                 </div>    
                 <br/>
                 <div className="player-count">
-                    <p>Players: {game?.player_count}/2</p>
+                    <p className='elementouuu'>Players: {game?.player_count}/2</p>
+                    {game?.started=== false && <a href={`/newreport/${game?.id}`} className='elementouuu'>Reportar oponente</a>}
                 </div>
                 {userPlayer?.id === game?.playerOne && game?.started === false && (
                 <button onClick={startGame} disabled={game?.player_count !== 2}>Comenzar Partida</button>
