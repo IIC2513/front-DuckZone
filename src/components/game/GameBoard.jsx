@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useContext, useRef } from 'react';
 import { useParams } from 'react-router-dom';
+import { flushSync } from 'react-dom';
 import { AuthContext } from '../auth/AuthContext';
 import axios from 'axios';
 import io from "socket.io-client";
@@ -323,9 +324,12 @@ function GameBoard() {
         const performTurnActions = async () => {
             if (game?.card_1 && game?.card_2 && !game.updated_cards) {
                 setCardsBlocked(true);  
+                
                 setTimeout(() => {
+                    flushSync(() => {
                     setCardsBlocked(false);
                     setPlayed(false);
+                    });
                 }, 5500);
                 setGame(prevGame => ({
                     ...prevGame,
