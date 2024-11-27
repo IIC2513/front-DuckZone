@@ -8,7 +8,7 @@ const SocketProvider = ({ children }) => {
     const connectSocket = (userId) => {
         const storedUserId = userId || localStorage.getItem('user_id');
         if (storedUserId) {
-            socket.current = io("ws://localhost:3000", {
+            socket.current = io(import.meta.env.VITE_BACKEND_URL, {
                 reconnection: true,
                 reconnectionAttempts: 10,
                 reconnectionDelay: 1000    
