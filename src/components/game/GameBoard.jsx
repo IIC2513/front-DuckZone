@@ -301,6 +301,12 @@ function GameBoard() {
     };
 
     useEffect(() => {
+        fetchGame();
+        fetchPlayers();
+        fetchPlayerCards();
+    }, []);
+
+    useEffect(() => {
         if (game?.started) {
             fetchGame();
             fetchPlayers();
