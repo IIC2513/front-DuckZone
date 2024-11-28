@@ -199,6 +199,9 @@ function GameBoard() {
                 setStageOneComplete(false);
                 setStageTwoComplete(false);
                 setStageThreeComplete(false);
+                fetchGame();
+                fetchPlayers();
+                fetchPlayerCards();
             }
         };
 
