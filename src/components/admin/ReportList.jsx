@@ -72,7 +72,7 @@ function Reports() {
                         <div key={index} className='grid'>
                             <p className='elemento'>{usernames[report.victim]}</p>
                             <p className='elemento'>{usernames[report.reported]}</p>
-                            <p className='elemento'>{report.status}</p>
+                            <a className='elemento' href={`/adm/reports/${report.id}`}>{report.status}</a>
                             <p className='elemento'>{report.description}</p>
                         </div>
                     ))}
