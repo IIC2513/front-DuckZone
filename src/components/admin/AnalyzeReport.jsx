@@ -4,6 +4,10 @@ import axios from 'axios';
 
 function Reportee() {
     const { reportId } = useParams();
+    const currentPath = window.location.pathname;
+    const slicedPath = currentPath.slice(0, currentPath.lastIndexOf('/'));
+    console.log("Current Path:", currentPath);
+    console.log("Sliced Path:", slicedPath);
     const [isAdmin, setIsAdmin] = useState(false);
     const [report, setReport] = useState(null);
     const [usernames, setUsernames] = useState({});
@@ -11,7 +15,7 @@ function Reportee() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                console.log("Report ID from URL:", reportId);
+                console.log("Report ID from URL:", reportId, slicedPath);
                 const token = localStorage.getItem('token'); 
                 const userId = localStorage.getItem('user_id');
                 console.log("Token:", token); 
@@ -30,7 +34,7 @@ function Reportee() {
                     setIsAdmin(false);
                 }
 
-                const reportResponse = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/reports/${reportId}`, {
+                const reportResponse = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/reports/${slicedPath}`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
