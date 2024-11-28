@@ -44,7 +44,7 @@ function Routing() {
                 <Route path="/newprivate" element={<NewPrivate />} />
                 <Route path="/usercheck" element={<UserCheck />} />
                 <Route path="/adm/reports" element={<Reports />} />
-                <Route path="/adm/reports/:id" element={<Report />} />
+                <Route path="/adm/reports/:id" element={<Reportee />} />
                 <Route path="/adm/users" element={<Users />} />
                 <Route path="/admincheck" element={<AdminCheck />} />
                 <Route path="/games/:id" element={<GameBoard />} /> 
