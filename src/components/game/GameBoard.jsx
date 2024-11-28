@@ -192,6 +192,7 @@ function GameBoard() {
             if (stageTwoComplete) {
                 await new Promise(resolve => setTimeout(resolve, 1000));
                 await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${userPlayer.id}/refill_hand`, { method: 'PATCH' });
+                await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${otherPlayer.id}/refill_hand`, { method: 'PATCH' });
                 await fetch(`${import.meta.env.VITE_BACKEND_URL}/update_cards_false/${gameId}`, { method: 'PATCH' });
                 setStageThreeComplete(true);
                 setCardsBlocked(false);
