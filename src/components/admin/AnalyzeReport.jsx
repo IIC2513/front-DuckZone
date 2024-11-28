@@ -2,13 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 
-function Report() {
+function Reportee() {
     const { reportId } = useParams();
     const [isAdmin, setIsAdmin] = useState(false);
     const [report, setReport] = useState(null);
     const [usernames, setUsernames] = useState({});
 
     useEffect(() => {
+        console.log("Report ID from URL:", reportId);
         const fetchData = async () => {
             try {
                 const token = localStorage.getItem('token'); 
@@ -115,4 +116,4 @@ function Report() {
     );
 }
 
-export default Report;
+export default Reportee;
