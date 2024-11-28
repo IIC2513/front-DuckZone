@@ -73,6 +73,9 @@ function Report() {
             <h1>Reporte</h1>
             {isAdmin ? (
                 <p>Bienvenido, Admin!</p>
+            ) : (
+                <p>No tienes permisos de administrador.</p>
+            )}
                 {report && (
                     <>
                     <div className='grid'>
@@ -104,9 +107,6 @@ function Report() {
                     </div>
                     </>
                 )}
-            ) : (
-                <p>No tienes permisos de administrador.</p>
-            )}
         </>
     );
 }
