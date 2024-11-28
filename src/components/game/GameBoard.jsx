@@ -192,7 +192,6 @@ function GameBoard() {
             if (stageTwoComplete) {
                 await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${userPlayer.id}/refill_hand`, { method: 'PATCH' });
                 await fetch(`${import.meta.env.VITE_BACKEND_URL}/update_cards_false/${gameId}`, { method: 'PATCH' });
-                await new Promise(resolve => setTimeout(resolve, 3000));
                 setStageThreeComplete(true);
                 setCardsBlocked(false);
                 setPlayed(false);
@@ -205,6 +204,7 @@ function GameBoard() {
     useEffect(() => {
         const performStageFour = async () => {
             if (stageThreeComplete) {
+                await new Promise(resolve => setTimeout(resolve, 3000));
                 await fetchGame();
                 await fetchPlayers();
                 await fetchPlayerCards();
