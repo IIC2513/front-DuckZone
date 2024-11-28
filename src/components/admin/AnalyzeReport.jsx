@@ -12,26 +12,30 @@ function Report() {
         const fetchData = async () => {
             try {
                 const token = localStorage.getItem('token'); 
+                const userId = localStorage.getItem('user_id');
                 console.log("Token:", token); 
+                console.log("User ID:", userId);
 
-                const userResponse = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/users/${localStorage.getItem('user_id')}`, {
+                const userResponse = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/users/${userId}`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
                 });
+
+                console.log("User data:", userResponse.data);
+                if (userResponse.data.is_admin === 1) {
+                    setIsAdmin(true);
+                } else {
+                    setIsAdmin(false);
+                }
 
                 const reportResponse = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/reports/${reportId}`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
                 });
-                console.log(reportResponse.data)
+                console.log(reportResponse.data);
                 setReport(reportResponse.data);
-
-                console.log("User data:", userResponse.data);
-                if (userResponse.data.is_admin === 1) {
-                    setIsAdmin(true);
-                }
 
                 const usersResponse = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/users`, {
                     headers: {
@@ -76,37 +80,37 @@ function Report() {
             ) : (
                 <p>No tienes permisos de administrador.</p>
             )}
-                {report && (
-                    <>
-                    <div className='grid'>
-                        <h2>Reporte n°{report.id}</h2>
-                        {report.status !== 'Revisado' && (
-                            <button onClick={handleMarkAsReviewed}>Marcar como revisado</button>
-                        )}
-                        {report.status === 'Revisado' && (
-                            <p>Revisado</p>
-                        )}
+            {report && (
+                <>
+                <div className='grid'>
+                    <h2>Reporte n°{report.id}</h2>
+                    {report.status !== 'Revisado' && (
+                        <button onClick={handleMarkAsReviewed}>Marcar como revisado</button>
+                    )}
+                    {report.status === 'Revisado' && (
+                        <p>Revisado</p>
+                    )}
+                </div>
+                <div className='grid'>
+                    <div className='elemento'>
+                        <h4>Víctima:</h4>
+                        <p>{usernames[report.victim]}</p>
                     </div>
-                    <div className='grid'>
-                        <div className='elemento'>
-                            <h4>Víctima:</h4>
-                            <p>{usernames[report.victim]}</p>
-                        </div>
-                        <div className='elemento'>
-                            <h4>Reportado:</h4>
-                            <p>{usernames[report.reported]}</p>
-                        </div>
-                        <div className='elemento'>
-                            <h4>Estado del reporte:</h4>
-                            <p>{report.status}</p>
-                        </div>
-                        <div className='elemento'>
-                            <h4>Descripción:</h4>
-                            <p>{report.description}</p>
-                        </div>
+                    <div className='elemento'>
+                        <h4>Reportado:</h4>
+                        <p>{usernames[report.reported]}</p>
                     </div>
-                    </>
-                )}
+                    <div className='elemento'>
+                        <h4>Estado del reporte:</h4>
+                        <p>{report.status}</p>
+                    </div>
+                    <div className='elemento'>
+                        <h4>Descripción:</h4>
+                        <p>{report.description}</p>
+                    </div>
+                </div>
+                </>
+            )}
         </>
     );
 }
