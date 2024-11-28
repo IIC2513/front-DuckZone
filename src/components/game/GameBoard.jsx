@@ -25,6 +25,10 @@ function GameBoard() {
     const [cardTwoGame, setCardTwoGame] = React.useState(null);
     const [cardsBlocked, setCardsBlocked] = React.useState(false);
     const [played, setPlayed] = React.useState(false);
+    const [stageOneComplete, setStageOneComplete] = useState(false);
+    const [stageTwoComplete, setStageTwoComplete] = useState(false);
+    const [stageThreeComplete, setStageThreeComplete] = useState(false);
+
     const socket = useRef(null);
     const config = {
         method: 'get',
@@ -143,13 +147,10 @@ function GameBoard() {
     }, [game]);
 
     useEffect(() => {
-        if (game) {
-        fetchPlayerCards();
+        if (userPlayer && game) {
+            fetchPlayerCards();
         }
     }, [userPlayer, game]);
-    const [stageOneComplete, setStageOneComplete] = useState(false);
-    const [stageTwoComplete, setStageTwoComplete] = useState(false);
-    const [stageThreeComplete, setStageThreeComplete] = useState(false);
 
     useEffect(() => {
         const performTurnActions = async () => {
@@ -177,7 +178,7 @@ function GameBoard() {
                     await new Promise(resolve => setTimeout(resolve, 3000));
                     setStageTwoComplete(true);
                 } else {
-                    await new Promise(resolve => setTimeout(resolve, 3500));
+                    await new Promise(resolve => setTimeout(resolve, 3000));
                     setStageTwoComplete(true);
                 }
             }
@@ -189,12 +190,15 @@ function GameBoard() {
     useEffect(() => {
         const performStageThree = async () => {
             if (stageTwoComplete) {
-                await new Promise(resolve => setTimeout(resolve, 2000));
+                await new Promise(resolve => setTimeout(resolve, 1000));
                 await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${userPlayer.id}/refill_hand`, { method: 'PATCH' });
                 await fetch(`${import.meta.env.VITE_BACKEND_URL}/update_cards_false/${gameId}`, { method: 'PATCH' });
                 setStageThreeComplete(true);
                 setCardsBlocked(false);
                 setPlayed(false);
+                setStageOneComplete(false);
+                setStageTwoComplete(false);
+                setStageThreeComplete(false);
             }
         };
 
