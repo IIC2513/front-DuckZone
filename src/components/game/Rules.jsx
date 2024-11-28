@@ -48,7 +48,7 @@ function Rules() {
                         Una vez que ambos jugadores han elegido su carta, se revelan las cartas de ambos jugadores. No hay turnos de ataque y defensa, 
                         ambos jugadores atacan y defienden al mismo tiempo. Es importante considerar que la posibilidad de jugar cartas depende directamente 
                         del mana disponible. Un jugador siempre tendrá 5 cartas en la mano al inicio de cada ronda. El mana disponible al inicio de cada ronda 
-                        es inicialmente 4 y va incrementando en 1 por cada ronda que pasa, hasta llegar a 9.
+                        es inicialmente 4 y va incrementando en 1 por cada dos rondas que pasan, hasta llegar a 9.
                     </p>
                     <ul>
                         <li>
