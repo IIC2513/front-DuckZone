@@ -199,6 +199,7 @@ function GameBoard() {
                 setStageOneComplete(false);
                 setStageTwoComplete(false);
                 setStageThreeComplete(false);
+                await new Promise(resolve => setTimeout(resolve, 1000));
                 fetchGame();
                 fetchPlayers();
                 fetchPlayerCards();
