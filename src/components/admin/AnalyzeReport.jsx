@@ -9,9 +9,9 @@ function Reportee() {
     const [usernames, setUsernames] = useState({});
 
     useEffect(() => {
-        console.log("Report ID from URL:", reportId);
         const fetchData = async () => {
             try {
+                console.log("Report ID from URL:", reportId);
                 const token = localStorage.getItem('token'); 
                 const userId = localStorage.getItem('user_id');
                 console.log("Token:", token); 
