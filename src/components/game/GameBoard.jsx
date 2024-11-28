@@ -118,7 +118,7 @@ function GameBoard() {
                 socket.current.off("player_updated", handlePlayerUpdated);
             }
         };
-    }, [gameId, userPlayer, otherPlayer]);
+    }, []);
     
    
 
