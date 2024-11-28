@@ -68,7 +68,7 @@ function Reportee() {
     const handleMarkAsReviewed = async () => {
         const token = localStorage.getItem('token');
         try {
-            await axios.put(`${import.meta.env.VITE_BACKEND_URL}/reports/${reportId}/check`, {}, {
+            await axios.patch(`${import.meta.env.VITE_BACKEND_URL}/reports/${reportIdFromPath}/check`, {}, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
