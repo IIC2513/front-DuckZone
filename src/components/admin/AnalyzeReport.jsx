@@ -14,7 +14,7 @@ function Report() {
                 const token = localStorage.getItem('token'); 
                 console.log("Token:", token); 
 
-                const userResponse = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/users/current`, {
+                const userResponse = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/users/${localStorage.getItem('user_id')}`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -73,34 +73,39 @@ function Report() {
             <h1>Reporte</h1>
             {isAdmin ? (
                 <p>Bienvenido, Admin!</p>
+                {report && (
+                    <>
+                    <div className='grid'>
+                        <h2>Reporte n°{report.id}</h2>
+                        {report.status !== 'Revisado' && (
+                            <button onClick={handleMarkAsReviewed}>Marcar como revisado</button>
+                        )}
+                        {report.status === 'Revisado' && (
+                            <p>Revisado</p>
+                        )}
+                    </div>
+                    <div className='grid'>
+                        <div className='elemento'>
+                            <h4>Víctima:</h4>
+                            <p>{usernames[report.victim]}</p>
+                        </div>
+                        <div className='elemento'>
+                            <h4>Reportado:</h4>
+                            <p>{usernames[report.reported]}</p>
+                        </div>
+                        <div className='elemento'>
+                            <h4>Estado del reporte:</h4>
+                            <p>{report.status}</p>
+                        </div>
+                        <div className='elemento'>
+                            <h4>Descripción:</h4>
+                            <p>{report.description}</p>
+                        </div>
+                    </div>
+                    </>
+                )}
             ) : (
                 <p>No tienes permisos de administrador.</p>
-            )}
-            {report && (
-                <>
-                <div className='grid'>
-                    <h2>Reporte n°{report.id}</h2>
-                    <button>Marcar como revisado</button>
-                </div>
-                <div className='grid'>
-                    <div className='elemento'>
-                        <h4>Víctima:</h4>
-                        <p>{usernames[report.victim]}</p>
-                    </div>
-                    <div className='elemento'>
-                        <h4>Reportado:</h4>
-                        <p>{usernames[report.reported]}</p>
-                    </div>
-                    <div className='elemento'>
-                        <h4>Estado del reporte:</h4>
-                        <p>{report.status}</p>
-                    </div>
-                    <div className='elemento'>
-                        <h4>Descripción:</h4>
-                        <p>{report.description}</p>
-                    </div>
-                </div>
-                </>
             )}
         </>
     );
