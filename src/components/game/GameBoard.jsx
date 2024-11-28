@@ -150,7 +150,7 @@ function GameBoard() {
         if (userPlayer && game) {
             fetchPlayerCards();
         }
-    }, [userPlayer, game]);
+    }, [userPlayer, game, userPlayer?.cardOneId, userPlayer?.cardTwoId, userPlayer?.cardThreeId, userPlayer?.cardFourId, userPlayer?.cardFiveId]);
 
     useEffect(() => {
         const performTurnActions = async () => {
@@ -196,18 +196,27 @@ function GameBoard() {
                 setStageThreeComplete(true);
                 setCardsBlocked(false);
                 setPlayed(false);
-                setStageOneComplete(false);
-                setStageTwoComplete(false);
-                setStageThreeComplete(false);
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                fetchGame();
-                fetchPlayers();
-                fetchPlayerCards();
             }
         };
 
         performStageThree();
     }, [stageTwoComplete]);
+
+    useEffect(() => {
+        const performStageFour = async () => {
+            if (stageThreeComplete) {
+                await fetchGame();
+                await fetchPlayers();
+                await fetchPlayerCards();
+                setStageOneComplete(false);
+                setStageTwoComplete(false);
+                setStageThreeComplete(false);
+                
+            }
+        };
+
+        performStageFour();
+    }, [stageThreeComplete]);
 
     useEffect(() => {
         if (userPlayer) {
