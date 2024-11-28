@@ -20,7 +20,7 @@ import GameBoard from '../game/GameBoard';
 import Reports from '../admin/ReportList';
 import AdminFooter from '../admin/Footer';
 import Users from '../admin/UserList';
-import Report from '../admin/AnalyzeReport';
+import Reportee from '../admin/AnalyzeReport';
 import JoinPrivate from '../game/JoinPrivate';
 function Routing() {
     return(
