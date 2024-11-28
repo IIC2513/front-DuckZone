@@ -193,8 +193,6 @@ function GameBoard() {
                 await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${userPlayer.id}/refill_hand`, { method: 'PATCH' });
                 await fetch(`${import.meta.env.VITE_BACKEND_URL}/update_cards_false/${gameId}`, { method: 'PATCH' });
                 setStageThreeComplete(true);
-                setCardsBlocked(false);
-                setPlayed(false);
             }
         };
 
@@ -211,7 +209,8 @@ function GameBoard() {
                 setStageOneComplete(false);
                 setStageTwoComplete(false);
                 setStageThreeComplete(false);
-                
+                setCardsBlocked(false);
+                setPlayed(false);
             }
         };
 
