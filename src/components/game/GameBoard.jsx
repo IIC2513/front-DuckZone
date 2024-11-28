@@ -147,32 +147,59 @@ function GameBoard() {
         fetchPlayerCards();
         }
     }, [userPlayer, game]);
+    const [stageOneComplete, setStageOneComplete] = useState(false);
+    const [stageTwoComplete, setStageTwoComplete] = useState(false);
+    const [stageThreeComplete, setStageThreeComplete] = useState(false);
 
     useEffect(() => {
         const performTurnActions = async () => {
             if (game?.card_1 && game?.card_2 && game.updated_cards === false) {
+                console.log('Performing turn actions');
                 setCardsBlocked(true);  
-                setTimeout(() => {
-                    setCardsBlocked(false);
-                    setPlayed(false);
-                }, 8000);
-                game.updated_cards = true;
                 await updatePlayedCards();
-                await new Promise(resolve => setTimeout(resolve, 3000));
-
-                if (userPlayer.id === game.playerOne) {
-                    await resolveTurn();
-                    await new Promise(resolve => setTimeout(resolve, 3000));
-                } else {
-                    await new Promise(resolve => setTimeout(resolve, 3500));
-                }
-
-                await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${userPlayer.id}/refill_hand`, { method: 'PATCH' });
+                // if (game) {
+                //     const updatedGame = { ...game, updated_cards: true };
+                //     setGame(updatedGame);
+                // }
+                setStageOneComplete(true);
             }
         };
 
         performTurnActions();
     }, [game]);
+
+    useEffect(() => {
+        const performStageTwo = async () => {
+            if (stageOneComplete) {
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                if (userPlayer.id === game.playerOne) {
+                    await resolveTurn();
+                    await new Promise(resolve => setTimeout(resolve, 3000));
+                    setStageTwoComplete(true);
+                } else {
+                    await new Promise(resolve => setTimeout(resolve, 3500));
+                    setStageTwoComplete(true);
+                }
+            }
+        };
+
+        performStageTwo();
+    }, [stageOneComplete]);
+
+    useEffect(() => {
+        const performStageThree = async () => {
+            if (stageTwoComplete) {
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                await fetch(`${import.meta.env.VITE_BACKEND_URL}/players/${userPlayer.id}/refill_hand`, { method: 'PATCH' });
+                await fetch(`${import.meta.env.VITE_BACKEND_URL}/update_cards_false/${gameId}`, { method: 'PATCH' });
+                setStageThreeComplete(true);
+                setCardsBlocked(false);
+                setPlayed(false);
+            }
+        };
+
+        performStageThree();
+    }, [stageTwoComplete]);
 
     useEffect(() => {
         if (userPlayer) {
