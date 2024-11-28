@@ -72,8 +72,8 @@ function Profile() {
             <div><img src={mascota} className='mascota'></img></div>
             <div>
               <img src={burbuja} className='burbuja'></img>
-              <p className='textob'>Mi Bio</p>
-              <p className='textob1'>Biografía estandar de tamaño maximo asi que: cacahuete cacahuete cacahuete cacahuete cacahuete cacahuete.</p>
+              <p className='textob'>{userInfo ? userInfo.name_duck : "Cargando..."}</p>
+              <p className='textob1'>Batalla para que tu patito sea más grande y fuerte. Sigue así uwu</p>
             </div>
             
         </div>
