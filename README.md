@@ -1,5 +1,7 @@
 # DuckZone 🦆
 
+https://duckzone.netlify.app
+
 ## Descripción
 
 DuckZone es un juego estratégico de cartas donde los jugadores compiten utilizando cartas de patos. Este proyecto está desarrollado con React y utiliza diversas herramientas y bibliotecas para su funcionamiento.
