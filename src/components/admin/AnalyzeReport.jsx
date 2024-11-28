@@ -8,6 +8,8 @@ function Reportee() {
     const slicedPath = currentPath.slice(0, currentPath.lastIndexOf('/'));
     console.log("Current Path:", currentPath);
     console.log("Sliced Path:", slicedPath);
+    const reportIdFromPath = currentPath.substring(currentPath.lastIndexOf('/') + 1);
+    console.log("Report ID from Path:", reportIdFromPath);
     const [isAdmin, setIsAdmin] = useState(false);
     const [report, setReport] = useState(null);
     const [usernames, setUsernames] = useState({});
@@ -34,7 +36,7 @@ function Reportee() {
                     setIsAdmin(false);
                 }
 
-                const reportResponse = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/reports/${slicedPath}`, {
+                const reportResponse = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/reports/${reportIdFromPath}`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
